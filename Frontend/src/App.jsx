@@ -4,7 +4,7 @@ const App = () => {
   const [msg, setMsg] = useState("");
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/users")   // <-- Backend URL put here
+    fetch("https://trendclips-lxyg.onrender.com/api/users")   // <-- Backend URL put here
       .then((res) => res.json())
       .then((data) => {
         setMsg(data.message);
