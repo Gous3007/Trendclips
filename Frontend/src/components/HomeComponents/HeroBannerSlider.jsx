@@ -3,15 +3,15 @@ import React, { useState, useEffect } from 'react';
 
 const slides = [
     {
-        url: "/public/Hero_Image_01.png",
+        url: "https://res.cloudinary.com/drppaqhmd/image/upload/v1765706965/hl4evtvr2hf9oeo0jgck.png",
         alt: "Fashion model 1"
     },
     {
-        url: "/public/Hero_Image_02.png",
+        url: "https://res.cloudinary.com/drppaqhmd/image/upload/v1765706894/kh9fwbmefbd1mci7v4vf.png",
         alt: "Fashion model 2"
     },
     {
-        url: "/public/Hero_Image_03.png",
+        url: "https://res.cloudinary.com/drppaqhmd/image/upload/v1765706970/qvejiaid1awca40ubjhm.png",
         alt: "Fashion model 3"
     }
 ];
