@@ -642,7 +642,7 @@ const ShopPage = () => {
                         image: product.image,
                       });
                     }}
-                      className="mt-3 w-full py-2 bg-yellow-400 hover:bg-yellow-500 text-slate-900 text-xs md:text-sm font-medium rounded-full transition-colors opacity-0 group-hover:opacity-100 md:opacity-0 md:group-hover:opacity-100 lg:opacity-100">
+                      className="mt-3 w-full py-2 bg-yellow-400 hover:bg-yellow-500 text-slate-900 text-xs md:text-sm font-medium rounded-full transition-colors">
                       Add to Cart
                     </button>
                   </div>
