@@ -8,7 +8,7 @@ import About from "./pages/About";
 import Shop from "./pages/Shop";
 import Contact from "./pages/Contact";
 import Products from "./pages/Products";
-import AddToCart from "./pages/cart";
+import AddToCart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
 import DashboardLayout from "./layouts/DashboardLayout";
 import DashboardHome from "./pages/dashboard/DashboardHome";
