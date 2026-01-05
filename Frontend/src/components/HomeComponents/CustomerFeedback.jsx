@@ -94,7 +94,7 @@ const CustomerFeedback = () => {
     const extendedFeedbacks = [...feedbacks, ...feedbacks, ...feedbacks];
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50 py-8 sm:py-12 md:py-16">
+        <div className="min-h-screen py-8 sm:py-12 md:py-16">
             <div className="max-w-7xl mx-auto px-4">
 
                 {/* Header */}
@@ -128,7 +128,7 @@ const CustomerFeedback = () => {
                         {extendedFeedbacks.map((feedback, index) => (
                             <div
                                 key={`${feedback.id}-${index}`}
-                                className="flex-shrink-0 w-64 sm:w-72 md:w-80 bg-white rounded-xl p-4 sm:p-6 shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 border border-purple-100"
+                                className="shrink-0 w-64 sm:w-72 md:w-80 bg-white rounded-xl p-4 sm:p-6 shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 border border-purple-100"
                             >
                                 {/* Quote Icon */}
                                 <div className="flex justify-center mb-3">
@@ -168,8 +168,8 @@ const CustomerFeedback = () => {
                     </div>
 
                     {/* Gradient Overlays for smooth edges */}
-                    <div className="absolute left-0 top-0 bottom-0 w-12 sm:w-20 bg-gradient-to-r from-purple-50 via-purple-50 to-transparent pointer-events-none z-10"></div>
-                    <div className="absolute right-0 top-0 bottom-0 w-12 sm:w-20 bg-gradient-to-l from-pink-50 via-pink-50 to-transparent pointer-events-none z-10"></div>
+                    <div className="absolute left-0 top-0 bottom-0 w-12 sm:w-20 bg-linear-to-r from-purple-50 via-purple-50 to-transparent pointer-events-none z-10"></div>
+                    <div className="absolute right-0 top-0 bottom-0 w-12 sm:w-20 bg-linear-to-l from-pink-50 via-pink-50 to-transparent pointer-events-none z-10"></div>
                 </div>
 
                 {/* Info Text */}

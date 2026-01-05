@@ -1,11 +1,18 @@
 import React, { useState } from "react";
+import { motion } from "framer-motion";
+import { flyToCart } from "../../utils/flyToCart.js";
 import { ShoppingCart, Heart, ChevronLeft, ChevronRight, Star } from "lucide-react";
+import { useCart } from "../../context/CartContext.jsx";
+import { useNavigate } from "react-router-dom";
+
 
 const categories = [
     { id: 1, name: "Hair Clips", image: "https://m.media-amazon.com/images/I/61L9MRQdoGL._AC_UL480_FMwebp_QL65_.jpg" },
     { id: 2, name: "Scrunchies", image: "https://m.media-amazon.com/images/I/81yyuU2jddL._AC_UL480_FMwebp_QL65_.jpg" },
     { id: 3, name: "Headbands", image: "https://m.media-amazon.com/images/I/51rbbgUbx0L._AC_UL480_FMwebp_QL65_.jpg" },
     { id: 4, name: "Barrettes", image: "https://m.media-amazon.com/images/I/71+Oqacy34L._AC_UL480_FMwebp_QL65_.jpg" },
+    { id: 5, name: "Home & Kitchen", image: "https://m.media-amazon.com/images/I/51yc7Nsy73L._AC_UL480_FMwebp_QL65_.jpg" },
+    { id: 6, name: "Stationery", image: "https://m.media-amazon.com/images/I/8115Djt33ML._AC_UL480_FMwebp_QL65_.jpg" },
 ];
 
 const featuredProducts = [
@@ -53,7 +60,7 @@ const featuredProducts = [
 
 const products = [
     {
-        id: 1,
+        id: 5,
         name: "Velvet Scrunchie",
         category: "Pastel Pink",
         price: 35.0,
@@ -62,7 +69,7 @@ const products = [
         image: "https://m.media-amazon.com/images/I/71h8B3pK5-L._AC_UL480_FMwebp_QL65_.jpg",
     },
     {
-        id: 2,
+        id: 6,
         name: "Gold Clip Set",
         category: "Minimalist Collection",
         price: 58.0,
@@ -71,7 +78,7 @@ const products = [
         image: "https://m.media-amazon.com/images/I/71roGSJHU3L._AC_UL480_FMwebp_QL65_.jpg",
     },
     {
-        id: 3,
+        id: 7,
         name: "Braided Headband",
         category: "Mint Green",
         price: 82.0,
@@ -80,7 +87,7 @@ const products = [
         image: "https://m.media-amazon.com/images/I/71bIKRCiNiL._AC_UL480_FMwebp_QL65_.jpg",
     },
     {
-        id: 4,
+        id: 8,
         name: "Pearl Barrette",
         category: "Elegant Occasion",
         price: 89.0,
@@ -92,7 +99,7 @@ const products = [
 
 const popular = [
     {
-        id: 5,
+        id: 9,
         name: "Floral Clip",
         price: 45,
         oldPrice: 65,
@@ -100,7 +107,7 @@ const popular = [
         image: "https://res.cloudinary.com/drppaqhmd/image/upload/v1765706075/hcsozgz4yohu0chbi76v.jpg"
     },
     {
-        id: 6,
+        id: 10,
         name: "Premium Scrunchie Set",
         price: 55,
         oldPrice: 80,
@@ -108,7 +115,7 @@ const popular = [
         image: "https://res.cloudinary.com/drppaqhmd/image/upload/v1765706519/fqn1luspzozjekuccfrl.png"
     },
     {
-        id: 7,
+        id: 11,
         name: "Black Pearl Clip",
         price: 60,
         oldPrice: 90,
@@ -118,6 +125,10 @@ const popular = [
 ];
 
 const ProductCollection = () => {
+    const navigate = useNavigate();
+
+    const { addToCart } = useCart();   // ✅ IMPORTANT
+
     const [featuredIndex, setFeaturedIndex] = useState(0);
     const [topPicksIndex, setTopPicksIndex] = useState(0);
     const [popIndex, setPopIndex] = useState(0);
@@ -147,7 +158,7 @@ const ProductCollection = () => {
     };
 
     return (
-        <div className="min-h-screen bg-linear-to-br from-purple-50 via-pink-50 to-blue-50">
+        <div className="min-h-screen">
             <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-10">
 
                 {/* HEADER */}
@@ -165,6 +176,7 @@ const ProductCollection = () => {
                         {categories.map((cat) => (
                             <div
                                 key={cat.id}
+                                onClick={() => navigate(`/shop/${cat.name}`)}   // 👈 magic here
                                 className="bg-white rounded-3xl p-5 shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer group text-center transform hover:-translate-y-2"
                             >
                                 <div className="w-full h-32 sm:h-36 overflow-hidden rounded-2xl mb-4 bg-linear-to-br from-purple-100 via-pink-100 to-blue-100">
@@ -174,7 +186,9 @@ const ProductCollection = () => {
                                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                                     />
                                 </div>
-                                <p className="font-bold text-gray-800 text-base sm:text-lg">{cat.name}</p>
+                                <p className="font-bold text-gray-800 text-base sm:text-lg">
+                                    {cat.name}
+                                </p>
                             </div>
                         ))}
                     </div>
@@ -212,9 +226,10 @@ const ProductCollection = () => {
                                     <div className="bg-white rounded-3xl shadow-2xl overflow-hidden group transform hover:-translate-y-2 transition-all duration-500">
                                         <div className="relative h-64 sm:h-80 md:h-96 overflow-hidden bg-linear-to-br from-purple-200 via-pink-200 to-blue-200">
                                             <img
-                                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                                                ref={(el) => (item.imgRef = el)}
                                                 src={item.image}
                                                 alt={item.name}
+                                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                                             />
                                             <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/20 to-transparent"></div>
                                             <div className="absolute top-4 left-4">
@@ -251,7 +266,18 @@ const ProductCollection = () => {
                                                     </div>
                                                     <p className="text-base line-through text-gray-400">₹{item.oldPrice}</p>
                                                 </div>
-                                                <button className="w-14 h-14 flex items-center justify-center bg-pink-400 text-white rounded-full hover:shadow-2xl transform hover:scale-110 hover:rotate-12 transition-all duration-300">
+                                                <button
+                                                    onClick={() => {
+                                                        flyToCart(item.imgRef); // 🪄 WORKING
+                                                        addToCart({
+                                                            id: item.id,
+                                                            name: item.name,
+                                                            price: item.price,
+                                                            image: item.image,
+                                                        });
+                                                    }}
+                                                    className="w-14 h-14 flex items-center justify-center bg-pink-400 text-white rounded-full hover:shadow-2xl transform hover:scale-110 hover:rotate-12 transition-all duration-300"
+                                                >
                                                     <ShoppingCart size={24} />
                                                 </button>
                                             </div>
@@ -317,41 +343,60 @@ const ProductCollection = () => {
                             className="flex transition-all duration-500"
                             style={{ transform: `translateX(-${topPicksIndex * 100}%)` }}
                         >
-                            {products.map((product) => (
-                                <div key={product.id} className="min-w-full">
-                                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-                                        {products.map((item) => (
-                                            <div key={item.id} className="bg-white rounded-2xl p-4 shadow-md hover:shadow-2xl transition-all duration-300 group transform hover:-translate-y-1">
-                                                <div className="relative h-44 sm:h-52 rounded-xl overflow-hidden mb-3 bg-linear-to-br from-purple-100 to-pink-100">
-                                                    <img src={item.image} alt={item.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-                                                    <span className="absolute top-2 left-2 bg-linear-to-r from-red-500 to-pink-500 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-lg">
-                                                        -{item.discount}% OFF
-                                                    </span>
-                                                    <button className="absolute top-2 right-2 bg-white/90 backdrop-blur-sm p-1.5 rounded-full shadow-lg hover:bg-white hover:scale-110 transition-all">
-                                                        <Heart size={16} className="text-red-500" />
-                                                    </button>
-                                                </div>
-
-                                                <h3 className="font-bold text-sm sm:text-base mb-1">{item.name}</h3>
-                                                <p className="text-xs text-gray-500 mb-3">{item.category}</p>
-
-                                                <div className="flex items-center justify-between">
-                                                    <div>
-                                                        <p className="font-bold text-lg text-gray-600">₹{item.price}</p>
-                                                        <p className="text-xs line-through text-gray-400">₹{item.oldPrice}</p>
-                                                    </div>
-
-                                                    <button className="w-10 h-10 flex items-center justify-center bg-pink-400 text-white rounded-full hover:shadow-lg hover:scale-110 hover:rotate-12 transition-all duration-300">
-                                                        <ShoppingCart size={18} />
-                                                    </button>
-                                                </div>
+                            {/* Single wrapper for all products */}
+                            <div className="min-w-full">
+                                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                                    {products.map((item) => (
+                                        <div
+                                            key={item.id}
+                                            className="bg-white rounded-2xl p-4 shadow-md hover:shadow-2xl transition-all duration-300 group transform hover:-translate-y-1"
+                                        >
+                                            <div className="relative h-44 sm:h-52 rounded-xl overflow-hidden mb-3 bg-linear-to-br from-purple-100 to-pink-100">
+                                                <img
+                                                    ref={(el) => (item.imgRef = el)}
+                                                    src={item.image}
+                                                    alt={item.name}
+                                                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                                                />
+                                                <span className="absolute top-2 left-2 bg-linear-to-r from-red-500 to-pink-500 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-lg">
+                                                    -{item.discount}% OFF
+                                                </span>
+                                                <button className="absolute top-2 right-2 bg-white/90 backdrop-blur-sm p-1.5 rounded-full shadow-lg hover:bg-white hover:scale-110 transition-all">
+                                                    <Heart size={16} className="text-red-500" />
+                                                </button>
                                             </div>
-                                        ))}
-                                    </div>
+
+                                            <h3 className="font-bold text-sm sm:text-base mb-1">{item.name}</h3>
+                                            <p className="text-xs text-gray-500 mb-3">{item.category}</p>
+
+                                            <div className="flex items-center justify-between">
+                                                <div>
+                                                    <p className="font-bold text-lg text-gray-600">₹{item.price}</p>
+                                                    <p className="text-xs line-through text-gray-400">₹{item.oldPrice}</p>
+                                                </div>
+
+                                                <button
+                                                    onClick={() => {
+                                                        flyToCart(item.imgRef); // ✅ animation works correctly now
+                                                        addToCart({
+                                                            id: item.id,
+                                                            name: item.name,
+                                                            price: item.price,
+                                                            image: item.image,
+                                                        });
+                                                    }}
+                                                    className="w-10 h-10 flex items-center justify-center bg-pink-400 text-white rounded-full hover:shadow-lg hover:scale-110 hover:rotate-12 transition-all duration-300"
+                                                >
+                                                    <ShoppingCart size={18} />
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))}
                                 </div>
-                            ))}
+                            </div>
                         </div>
                     </div>
+
                 </div>
 
                 {/* POPULAR THIS WEEK SLIDER */}
@@ -372,13 +417,14 @@ const ProductCollection = () => {
                                     <div className="bg-white rounded-3xl shadow-2xl overflow-hidden group transform hover:-translate-y-2 transition-all duration-500">
                                         <div className="relative h-64 sm:h-80 md:h-96 overflow-hidden bg-linear-to-br from-orange-200 via-pink-200 to-purple-200">
                                             <img
+                                                ref={(el) => (item.imgRef = el)}
                                                 src={item.image}
                                                 alt={item.name}
                                                 className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                                             />
                                             <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/20 to-transparent"></div>
                                             <span className="absolute top-4 left-4 bg-linear-to-r from-orange-500 to-red-500 text-white text-xs sm:text-sm px-4 py-2 rounded-full font-bold shadow-lg">
-                                                 HOT DEAL
+                                                HOT DEAL
                                             </span>
                                             <div className="absolute top-4 right-4">
                                                 <button className="bg-white/90 backdrop-blur-sm p-2.5 rounded-full shadow-lg hover:bg-white hover:scale-110 transition-all">
@@ -400,9 +446,21 @@ const ProductCollection = () => {
                                                     </div>
                                                     <p className="text-base line-through text-gray-400">₹{item.oldPrice}</p>
                                                 </div>
-                                                <button className="w-14 h-14 flex items-center justify-center bg-pink-400 text-white rounded-full hover:shadow-2xl transform hover:scale-110 hover:rotate-12 transition-all duration-300">
+                                                <button
+                                                    onClick={() => {
+                                                        flyToCart(item.imgRef);
+                                                        addToCart({
+                                                            id: item.id,
+                                                            name: item.name,
+                                                            price: item.price,
+                                                            image: item.image,
+                                                        });
+                                                    }}
+                                                    className="w-14 h-14 flex items-center justify-center bg-pink-400 text-white rounded-full hover:shadow-2xl transform hover:scale-110 hover:rotate-12 transition-all duration-300"
+                                                >
                                                     <ShoppingCart size={24} />
                                                 </button>
+
                                             </div>
                                         </div>
                                     </div>

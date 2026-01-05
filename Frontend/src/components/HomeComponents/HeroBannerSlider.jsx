@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-
+import { Link } from 'react-router-dom';
 
 const slides = [
     {
@@ -64,9 +64,11 @@ const HeroBannerSlider = () => {
                     </p>
 
                     {/* Button */}
-                    <button className="bg-[#8B5CF6] hover:bg-[#7c4dff] text-white font-semibold py-3 px-8 rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg">
-                        Shop Now
-                    </button>
+                    <Link to="/shop">
+                        <button className="bg-orange-500 hover:bg-orange-400 text-white font-semibold py-3 px-8 rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg cursor-pointer">
+                            Shop Now
+                        </button>
+                    </Link>
                 </div>
 
                 {/* Optional: Slider Indicators (Dots at bottom) */}

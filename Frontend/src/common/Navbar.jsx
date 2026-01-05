@@ -1,197 +1,370 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
+import { NavLink, Link } from "react-router-dom";
+import { useCart } from "../context/CartContext.jsx";
+import { useNavigate } from "react-router-dom";
 import {
-    User,
-    Heart,
-    ShoppingBag,
-    Menu,
-    X,
-    ChevronDown,
-    LogIn,
-    Shield,
-    Sparkles
-} from 'lucide-react';
+  Search,
+  MapPin,
+  ShoppingCart,
+  Menu,
+  X,
+  ChevronDown,
+  User,
+  Heart,
+} from "lucide-react";
 
 const Navbar = () => {
-    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-    const [isScrolled, setIsScrolled] = useState(false);
-    const [cartCount, setCartCount] = useState(3);
-    const [wishlistCount, setWishlistCount] = useState(5);
 
-    useEffect(() => {
-        const handleScroll = () => {
-            setIsScrolled(window.scrollY > 10);
-        };
-        window.addEventListener('scroll', handleScroll);
-        return () => window.removeEventListener('scroll', handleScroll);
-    }, []);
+  const [searchText, setSearchText] = useState("");
+  const [mobileSearch, setMobileSearch] = useState("");
+  const navigate = useNavigate();
 
-    const navLinks = [
-        { name: 'Home', href: '#' },
-        { name: 'Products', href: '#', hasDropdown: true },
-        { name: 'About Us', href: '#' },
-        { name: 'Contact Us', href: '#' },
-        { name: 'Orders', href: '#' },
-    ];
 
-    return (
-        <header
-            className={`w-full bg-white sticky top-0 z-50 font-sans transition-all duration-300 ${isScrolled ? 'shadow-xl border-b border-gray-100' : 'shadow-sm'
-                }`}
-        >
-            {/* Main Navbar */}
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex items-center justify-between h-20 gap-4">
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const { cartItems } = useCart();
+  const totalQty = cartItems.reduce(
+    (sum, item) => sum + item.quantity,
+    0
+  );
 
-                    {/* Logo Section */}
-                    <div className="flex items-center gap-3 shrink-0 cursor-pointer group">
-                        <div className="relative">
-                            <img
-                                src="/Trendclips_Logo-Photoroom.png"
-                                alt="Brand Logo"
-                                className="h-12 w-auto object-contain group-hover:scale-105 transition-transform duration-300"
-                            />
-                            <div className="absolute -right-2 -top-2">
-                                <Sparkles className="h-4 w-4 text-pink-500 animate-pulse" />
-                            </div>
-                        </div>
 
-                    </div>
+  const handleMobileSearch = () => {
+    if (!mobileSearch.trim()) return;
 
-                    {/* Desktop Navigation Links */}
-                    <nav className="hidden lg:flex items-center gap-1 flex-1 justify-center">
-                        {navLinks.map((link) => (
-                            <a
-                                key={link.name}
-                                href={link.href}
-                                className="relative px-5 py-2.5 text-sm font-semibold text-gray-800 hover:text-purple-600 transition-all duration-200 group"
-                            >
-                                <span className="flex items-center gap-2">
-                                    {link.name}
-                                    {link.hasDropdown && (
-                                        <ChevronDown size={14} className="group-hover:rotate-180 transition-transform duration-300" />
-                                    )}
-                                </span>
-                                <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-linear-to-r from-purple-600 to-pink-500 group-hover:w-4/5 transition-all duration-300 rounded-full"></span>
-                            </a>
-                        ))}
-                    </nav>
+    navigate(`/shop?search=${encodeURIComponent(mobileSearch)}`);
+    setMobileSearch("");
+  };
 
-                    {/* Right Icons */}
-                    <div className="flex items-center gap-3 sm:gap-4">
-                        {/* User Profile with Hover Dropdown */}
-                        <div className="relative group z-50">
-                            <div className="pb-2 -mb-2">
-                                <ActionIcon
-                                    icon={<User size={20} />}
-                                    label="Profile"
-                                />
-                            </div>
+  // Handle Scroll Effect for Header Shadow
+  useEffect(() => {
+    const handleScroll = () => setIsScrolled(window.scrollY > 10);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
-                            {/* Dropdown Menu */}
-                            <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-2xl border border-gray-100 invisible group-hover:visible opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-300 origin-top-right overflow-hidden">
-                                <div className="p-2 space-y-1">
-                                    <div className="px-4 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                                        Account
-                                    </div>
-                                    <a href="#" className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-600 rounded-lg transition-colors">
-                                        <LogIn size={16} />
-                                        Login your account
-                                    </a>
-                                    <div className="h-px bg-gray-100 my-1"></div>
-                                    <a href="#" className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-600 rounded-lg transition-colors">
-                                        <Shield size={16} />
-                                        Privacy Policy
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
+  // Handle Body Scroll Lock when Mobile Menu is Open
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = "hidden"; // Piche ka scroll band
+    } else {
+      document.body.style.overflow = "unset"; // Normal scroll chalu
+    }
+    return () => {
+      document.body.style.overflow = "unset"; // Cleanup
+    };
+  }, [isMobileMenuOpen]);
 
-                        {/* Cart */}
-                        <div className="relative">
-                            <ActionIcon
-                                icon={<ShoppingBag size={20} />}
-                                label="Cart"
-                                isHighlighted
-                            />
-                            {cartCount > 0 && (
-                                <span className="absolute -top-1.5 -right-1.5 h-5 w-5 bg-linear-to-r from-purple-600 to-pink-500 text-white text-xs font-bold rounded-full flex items-center justify-center ring-2 ring-white shadow-md">
-                                    {cartCount}
-                                </span>
-                            )}
-                        </div>
+  const navLinks = [
+    { name: "Shop", path: "/shop" },
+    { name: "About Us", path: "/about" },
+    { name: "Contact Us", path: "/contact" },
+  ];
 
-                        {/* Mobile Menu Button */}
-                        <button
-                            className="lg:hidden ml-1 p-2.5 rounded-full text-gray-700 hover:bg-gray-100 hover:text-purple-600 transition-all duration-200"
-                            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                        >
-                            {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-                        </button>
-                    </div>
+  const categories = [
+    "Hair Clips",
+    "Scrunchies",
+    "Headbands",
+    "Barrettes",
+    "Home & Kitchen",
+    "Stationery",
+  ];
+
+  return (
+    <header
+      className={`w-full bg-white sticky top-0 z-50 transition-shadow duration-300 ${isScrolled ? "shadow-lg" : "shadow-sm"
+        }`}
+    >
+      {/* Top Bar */}
+      <div className="bg-gray-900 text-white hidden md:block">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="flex items-center justify-between h-10 text-sm">
+            <div className="flex items-center gap-6">
+              <Link to="/" className="hover:text-gray-300">
+                Trendclips.in
+              </Link>
+              <div className="flex items-center gap-2">
+                <MapPin size={16} />
+                <span className="hover:text-gray-300 cursor-pointer">
+                  Deliver to Your Location
+                </span>
+              </div>
+            </div>
+            <div className="flex items-center gap-6">
+              <Link to="/account" className="hover:text-gray-300">
+                Account
+              </Link>
+              <Link to="/orders" className="hover:text-gray-300">
+                Returns & Orders
+              </Link>
+              <Link to="/wishlist" className="hover:text-gray-300">
+                Wishlist
+              </Link>
+              <Link to="/help" className="hover:text-gray-300">
+                Customer Service
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Navbar */}
+      <div className="max-w-7xl mx-auto px-4 bg-white relative z-50">
+        <div className="flex items-center justify-between h-16 md:h-20">
+          {/* Logo */}
+          <div className="flex items-center">
+            <Link to="/" className="flex items-center">
+              <div className="relative">
+                <img
+                  src="/Trendclips_Logo-Photoroom.png"
+                  alt="Trendclips"
+                  className="h-10 md:h-12 transition-transform hover:scale-105"
+                />
+              </div>
+            </Link>
+
+            {/* Categories Menu - Desktop */}
+            <div className="hidden lg:flex ml-10 items-center gap-6">
+              {categories.map((category) => (
+                <div key={category} className="relative group">
+                  <button
+                    onClick={() => navigate(`/shop/${category}`)}
+                    className="flex items-center text-gray-700 hover:text-orange-500 font-medium text-sm cursor-pointer"
+                  >
+                    {category}
+                  </button>
                 </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Search Bar - Desktop */}
+          <div className="hidden md:flex flex-1 max-w-2xl mx-6">
+            <div className="relative w-full">
+              <input
+                type="text"
+                placeholder="Search Trendclips.in"
+                value={searchText}
+                onChange={(e) => setSearchText(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && searchText.trim()) {
+                    navigate(`/shop?search=${encodeURIComponent(searchText)}`);
+                  }
+                }}
+                className="w-full h-10 px-4 pr-12 text-sm border border-gray-300 rounded-l-md focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
+              />
+
+              <button
+                onClick={() => {
+                  if (searchText.trim()) {
+                    navigate(`/shop?search=${encodeURIComponent(searchText)}`);
+                  }
+                }}
+                className="absolute right-0 top-0 h-10 px-6 bg-orange-500 hover:bg-orange-600 text-white rounded-r-md"
+              >
+                <Search size={20} />
+              </button>
+            </div>
+          </div>
+
+
+          {/* Right Side Actions */}
+          <div className="flex items-center gap-2 md:gap-4">
+            {/* Account - Desktop */}
+            <div className="hidden md:block relative group">
+              <Link
+                to="/account"
+                className="flex flex-col items-center px-3 py-2 hover:text-orange-500"
+              >
+                <User size={22} />
+                <span className="text-xs mt-1">Account</span>
+              </Link>
             </div>
 
-            {/* Mobile Menu */}
-            {isMobileMenuOpen && (
-                <div className="lg:hidden bg-white border-t border-gray-100 absolute w-full shadow-2xl animate-slideDown">
-                    <div className="px-4 py-6 space-y-1">
-                        {/* Mobile Links */}
-                        <div className="flex flex-col space-y-1">
-                            {navLinks.map((link) => (
-                                <a
-                                    key={link.name}
-                                    href={link.href}
-                                    className="flex items-center justify-between p-3 text-gray-800 font-semibold hover:bg-purple-50 hover:text-purple-600 rounded-lg transition-all duration-200 group"
-                                    onClick={() => setIsMobileMenuOpen(false)}
-                                >
-                                    <span className="flex items-center gap-2">
-                                        {link.name}
-                                    </span>
-                                    {link.hasDropdown && (
-                                        <ChevronDown size={16} className="group-hover:rotate-180 transition-transform" />
-                                    )}
-                                </a>
-                            ))}
-                            {/* Account Links in Mobile Menu */}
-                            <div className="border-t border-gray-100 my-2 pt-2">
-                                <a
-                                    href="#"
-                                    className="flex items-center gap-2 p-3 text-gray-800 font-semibold hover:bg-purple-50 hover:text-purple-600 rounded-lg transition-colors"
-                                    onClick={() => setIsMobileMenuOpen(false)}
-                                >
-                                    <LogIn size={18} /> Login Account
-                                </a>
-                                <a
-                                    href="#"
-                                    className="flex items-center gap-2 p-3 text-gray-800 font-semibold hover:bg-purple-50 hover:text-purple-600 rounded-lg transition-colors"
-                                    onClick={() => setIsMobileMenuOpen(false)}
-                                >
-                                    <Shield size={18} /> Privacy Policy
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
-        </header>
-    );
-};
+            {/* Wishlist */}
+            <div className="hidden md:block">
+              <Link
+                to="/wishlist"
+                className="flex flex-col items-center px-3 py-2 hover:text-orange-500"
+              >
+                <Heart size={22} />
+                <span className="text-xs mt-1">Wishlist</span>
+              </Link>
+            </div>
 
-const ActionIcon = ({ icon, label, isHighlighted }) => (
-    <button
-        className={`relative p-2.5 rounded-full transition-all duration-300 group ${isHighlighted
-            ? 'bg-linear-to-r from-purple-600 to-pink-500 text-white hover:shadow-lg hover:shadow-purple-200 hover:scale-105'
-            : 'text-gray-700 hover:bg-gray-100 hover:text-purple-600 hover:scale-105'
-            }`}
-        aria-label={label}
-    >
-        {icon}
-        {label !== "Profile" && (
-            <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 px-2.5 py-1.5 bg-gray-900 text-white text-xs font-medium rounded-md opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none shadow-lg hidden sm:block">
-                {label}
-            </span>
-        )}
-    </button>
-);
+            {/* Cart */}
+            <div id="cart-icon" className="relative">
+              <Link
+                to="/cart"
+                className="flex flex-col items-center px-3 py-2 hover:text-orange-500"
+              >
+                <ShoppingCart size={22} />
+                <span className="text-xs mt-1">Cart</span>
+                {totalQty > 0 && (
+                  <span className="absolute -top-1 -right-1 md:top-0 md:right-2 h-5 w-5 bg-orange-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
+                    {totalQty}
+                  </span>
+                )}
+              </Link>
+            </div>
+
+            {/* Mobile Menu Toggle */}
+            <button
+              className="md:hidden p-2 ml-2 text-gray-700"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            >
+              {isMobileMenuOpen ? <X size={26} /> : <Menu size={26} />}
+            </button>
+          </div>
+        </div>
+
+        {/* Search Bar - Mobile */}
+        <div className="md:hidden py-3 border-t border-gray-100">
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="Search Trendclips.in"
+              value={mobileSearch}
+              onChange={(e) => setMobileSearch(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleMobileSearch()}
+              className="w-full h-10 px-4 pr-12 text-sm border border-gray-300 rounded-md focus:outline-none focus:border-orange-500"
+            />
+
+            <button
+              onClick={handleMobileSearch}
+              className="absolute right-0 top-0 h-10 px-4 bg-orange-500 text-white rounded-r-md flex items-center justify-center"
+            >
+              <Search size={20} />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Bottom Navigation - Desktop */}
+      <div className="hidden md:block border-t border-gray-200 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4">
+          <nav className="flex items-center justify-between h-10">
+            {/* UPDATED: Added ml-4 and increased gap for better spacing */}
+            <div className="flex items-center gap-8 ml-4">
+              <button className="flex items-center gap-1 text-sm font-bold text-gray-700 hover:text-orange-600 cursor-pointer">
+                <Menu size={18} /> All
+              </button>
+              {navLinks.map((link) => (
+                <NavLink
+                  key={link.name}
+                  to={link.path}
+                  className={({ isActive }) =>
+                    `text-sm font-medium transition-colors ${isActive
+                      ? "text-orange-600"
+                      : "text-gray-700 hover:text-orange-600"
+                    }`
+                  }
+                >
+                  {link.name}
+                </NavLink>
+              ))}
+            </div>
+
+            {/* Offers */}
+            <div className="flex items-center">
+              <span className="text-sm font-bold text-gray-800 cursor-pointer hover:text-orange-600">
+                Great Freedom Sale
+              </span>
+            </div>
+          </nav>
+        </div>
+      </div>
+
+      {/* Mobile Menu - Fixed Height & Scrollable */}
+      {isMobileMenuOpen && (
+        <div
+          className="md:hidden fixed left-0 right-0 bottom-0 bg-white z-40 overflow-y-auto shadow-inner"
+          // Height calculation: 100vh minus header height (approx 135px)
+          style={{ top: "135px", height: "calc(100vh - 135px)" }}
+        >
+          <div className="px-4 py-4 space-y-4 pb-20">
+            {/* User Greeting - Amazon Style */}
+            <div className="bg-gray-100 -mx-4 -mt-4 p-4 flex items-center gap-3 border-b">
+              <div className="bg-white p-2 rounded-full">
+                <User size={20} className="text-gray-600" />
+              </div>
+              <span className="font-bold text-lg text-gray-800">
+                Hello, Sign in
+              </span>
+            </div>
+
+            <div className="text-sm font-bold text-gray-900 uppercase pt-2">
+              Trending
+            </div>
+
+            <div className="border-t border-gray-200 my-2"></div>
+
+            <div className="text-sm font-bold text-gray-900 uppercase mb-2">
+              Shop By Category
+            </div>
+            {categories.map((category) => (
+              <button
+                key={category}
+                className="block w-full text-left py-3 px-2 font-medium text-gray-600 border-b border-gray-50 hover:bg-gray-50 hover:text-orange-500"
+              >
+                {category}
+              </button>
+            ))}
+
+            <div className="border-t border-gray-200 my-2 pt-2">
+              <div className="text-sm font-bold text-gray-900 uppercase mb-2">
+                Help & Settings
+              </div>
+              {navLinks.map((link) => (
+                <NavLink
+                  key={link.name}
+                  to={link.path}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={({ isActive }) =>
+                    `block py-3 px-2 font-medium rounded-lg ${isActive
+                      ? "text-orange-500 bg-orange-50"
+                      : "text-gray-600 hover:bg-gray-50 hover:text-orange-500"
+                    }`
+                  }
+                >
+                  {link.name}
+                </NavLink>
+              ))}
+            </div>
+
+            <div className="border-t border-gray-200 pt-3 space-y-2">
+              <Link
+                to="/account"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="flex items-center gap-3 py-2 px-2 font-medium text-gray-600 hover:bg-gray-50"
+              >
+                <User size={20} />
+                Your Account
+              </Link>
+              <Link
+                to="/wishlist"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="flex items-center gap-3 py-2 px-2 font-medium text-gray-600 hover:bg-gray-50"
+              >
+                <Heart size={20} />
+                Your Wishlist
+              </Link>
+              <Link
+                to="/help"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="flex items-center gap-3 py-2 px-2 font-medium text-gray-600 hover:bg-gray-50"
+              >
+                <div className="w-5 h-5 flex items-center justify-center font-bold border border-gray-600 rounded-full text-[10px]">
+                  ?
+                </div>
+                Customer Service
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
+    </header>
+  );
+};
 
 export default Navbar;
