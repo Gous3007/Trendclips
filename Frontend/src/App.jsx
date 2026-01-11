@@ -10,12 +10,15 @@ import Contact from "./pages/Contact";
 import Products from "./pages/Products";
 import AddToCart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
+import PaymentPage from "./pages/Payments";
+import AddressPage from "./pages/Address";
 import DashboardLayout from "./layouts/DashboardLayout";
 import DashboardHome from "./pages/dashboard/DashboardHome";
 import DashboardProduct from "./pages/dashboard/Product.jsx";
 import Order from "./pages/dashboard/Order.jsx"
 import AddProduct from "./pages/dashboard/AddProduct.jsx";
 import EditProductPage from "./pages/dashboard/EditProductPage.jsx";
+import ShowcaseManager from "./pages/dashboard/ShowcaseManager.jsx";
 import { initLenis, destroyLenis } from "./utils/lenis";
 
 const AnimatedRoutes = () => {
@@ -31,9 +34,11 @@ const AnimatedRoutes = () => {
             <Route path="/shop" element={<Shop />} />
             <Route path="/shop/:category" element={<Shop />} />
             <Route path="/contact" element={<Contact />} />
-            <Route path="/product" element={<Products />} />
+            <Route path="/info/products/:id" element={<Products />} />
             <Route path="/cart" element={<AddToCart />} />
             <Route path="/checkout" element={<Checkout />} />
+            <Route path="/payment" element={<PaymentPage />} />
+            <Route path="/address" element={<AddressPage />} />
           </Route>
           {/* Dashboard Routes */}
           <Route path="/dashboard" element={<DashboardLayout />}>
@@ -42,6 +47,7 @@ const AnimatedRoutes = () => {
             <Route path="order" element={<Order />} />
             <Route path="add" element={<AddProduct />} />
             <Route path="edit" element={<EditProductPage />} />
+            <Route path="showcase" element={<ShowcaseManager />} />
           </Route>
         </Routes>
       </CartProvider>

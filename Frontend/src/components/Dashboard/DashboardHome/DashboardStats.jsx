@@ -34,7 +34,7 @@ const DashboardStats = () => {
     ];
 
     return (
-        <div className="w-full bg-[#111827] p-6 text-white">
+        <div className="w-full bg-[#0B0F19] p-6 text-white">
             {/* Header Section */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">
                 <div>

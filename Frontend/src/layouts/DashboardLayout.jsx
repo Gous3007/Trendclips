@@ -6,7 +6,7 @@ const DashboardLayout = () => {
         <div className="flex min-h-screen bg-gray-100">
 
             {/* Sidebar - 20% */}
-            <div className="w-[20%] bg-gray-900 text-white">
+            <div className="w-[20%] bg-[#0B0F19] text-white">
                 <Sidebar />
             </div>
 

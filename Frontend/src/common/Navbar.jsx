@@ -94,11 +94,8 @@ const Navbar = () => {
               <Link to="/account" className="hover:text-gray-300">
                 Account
               </Link>
-              <Link to="/orders" className="hover:text-gray-300">
+              <Link to="/shop" className="hover:text-gray-300">
                 Returns & Orders
-              </Link>
-              <Link to="/wishlist" className="hover:text-gray-300">
-                Wishlist
               </Link>
               <Link to="/help" className="hover:text-gray-300">
                 Customer Service
@@ -178,17 +175,6 @@ const Navbar = () => {
               >
                 <User size={22} />
                 <span className="text-xs mt-1">Account</span>
-              </Link>
-            </div>
-
-            {/* Wishlist */}
-            <div className="hidden md:block">
-              <Link
-                to="/wishlist"
-                className="flex flex-col items-center px-3 py-2 hover:text-orange-500"
-              >
-                <Heart size={22} />
-                <span className="text-xs mt-1">Wishlist</span>
               </Link>
             </div>
 

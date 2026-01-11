@@ -57,7 +57,7 @@ const RecentOrders = () => {
     };
 
     return (
-        <div className="w-full bg-[#111827] p-6 text-white">
+        <div className="w-full bg-[#0B0F19] p-6 text-white">
             <h2 className="text-2xl font-bold mb-6">Recent Orders</h2>
 
             {/* Table Container - Mobile Responsive Scrolling */}

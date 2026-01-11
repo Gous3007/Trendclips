@@ -3,7 +3,7 @@ import DashboardAnalytics from "../../components/Dashboard/DashboardHome/Dashboa
 import RecentOrders from "../../components/Dashboard/DashboardHome/RecentOrders";
 const DashboardHome = () => {
     return (
-        <div>
+        <div className="bg-[#0B0F19]">
             <DashboardStats />
             <DashboardAnalytics/>
             <RecentOrders/>

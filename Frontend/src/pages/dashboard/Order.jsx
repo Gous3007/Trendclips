@@ -67,7 +67,7 @@ const Orders = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gray-900 text-white p-4 md:p-6">
+        <div className="min-h-screen bg-[#0B0F19] text-white p-4 md:p-6">
 
             {/* Header Section */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">

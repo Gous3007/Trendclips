@@ -34,7 +34,7 @@ const DashboardAnalytics = () => {
     ];
 
     return (
-        <div className="w-full bg-[#111827] p-6 text-white">
+        <div className="w-full bg-[#0B0F19] p-6 text-white">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
                 {/* --- Left Side: Sales Trend Chart (Spans 2 columns on Desktop) --- */}

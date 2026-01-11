@@ -10,7 +10,8 @@ import {
   Plus,
   PlusCircle,
   Pencil,
-  ShoppingBasket
+  ShoppingBasket,
+  ArrowLeftIcon
 } from "lucide-react";
 
 const Sidebar = () => {
@@ -26,6 +27,7 @@ const Sidebar = () => {
         { name: "Add Product", path: "/dashboard/add", icon: <PlusCircle size={20} /> },
         { name: "Edit Product", path: "/dashboard/edit", icon: <Pencil size={20} /> },
         { name: "Customers", path: "/dashboard/customers", icon: <Users size={20} /> },
+        { name: "Showcase", path: "/dashboard/showcase", icon: <ClipboardList size={20} /> },
     ];
 
     return (
@@ -51,7 +53,7 @@ const Sidebar = () => {
             {/* 📌 Sidebar */}
             <aside
                 className={`
-          fixed top-0 left-0 h-full w-64 bg-gray-900 text-gray-400
+          fixed top-0 left-0 h-full w-64 bg-[#0B0F19] text-gray-400
           flex flex-col justify-between
           transition-transform duration-300 z-40
           ${isOpen ? "translate-x-0" : "-translate-x-full"}
@@ -95,9 +97,13 @@ const Sidebar = () => {
 
                 {/* ➕ Bottom Action */}
                 <div className="p-4">
-                    <button className="w-full bg-sky-500 hover:bg-sky-600 text-white font-semibold py-3 rounded-lg flex items-center justify-center gap-2 shadow-lg">
+                    <button className="w-full bg-sky-500 hover:bg-sky-600 text-white font-semibold py-3 rounded-lg flex items-center justify-center gap-2 shadow-lg mb-5">
                         <Plus size={18} />
                         Add Product
+                    </button>
+                    <button className="w-full bg-red-500 hover:bg-red-400 text-white font-semibold py-3 rounded-lg flex items-center justify-center gap-2 shadow-lg">
+                        <ArrowLeftIcon size={18} />
+                        Logout
                     </button>
                 </div>
             </aside>

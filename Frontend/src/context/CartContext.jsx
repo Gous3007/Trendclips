@@ -21,12 +21,22 @@ export const CartProvider = ({ children }) => {
             if (exists) {
                 return prev.map(item =>
                     item.id === product.id
-                        ? { ...item, quantity: item.quantity + 1 }
+                        ? {
+                            ...item,
+                            quantity: item.quantity + product.quantity // ✅ FIX
+                        }
                         : item
                 );
             }
 
-            return [...prev, { ...product, quantity: 1 }];
+            // ✅ NEW ITEM: use passed quantity
+            return [
+                ...prev,
+                {
+                    ...product,
+                    quantity: product.quantity // ✅ FIX
+                }
+            ];
         });
     };
 

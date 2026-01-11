@@ -1,107 +1,54 @@
-import React from 'react';
+import React, { useEffect, useState } from "react";
 import { Star, Heart } from 'lucide-react';
+import { useNavigate } from "react-router-dom";
+import api from "../../api/axios.js";
 
-const RelatedProducts = () => {
-    const products = [
-        {
-            id: 1,
-            name: 'Pastel Scrunchie Set',
-            price: '299',
-            originalPrice: '599',
-            discount: '50',
-            rating: 4.3,
-            reviews: 2847,
-            image: 'https://images.unsplash.com/photo-1535413089162-ef1f91c4ab8b?auto=format&fit=crop&q=80&w=400'
-        },
-        {
-            id: 2,
-            name: 'Marble Claw Clip',
-            price: '499',
-            originalPrice: '799',
-            discount: '38',
-            rating: 4.5,
-            reviews: 1923,
-            image: 'https://images.unsplash.com/photo-1596462502278-27bfdd403ea6?auto=format&fit=crop&q=80&w=400&hue=30'
-        },
-        {
-            id: 3,
-            name: 'Golden Hair Pin',
-            price: '399',
-            originalPrice: '699',
-            discount: '43',
-            rating: 4.7,
-            reviews: 4521,
-            image: 'https://images.unsplash.com/photo-1630019329803-046a482b5a3e?auto=format&fit=crop&q=80&w=400'
-        },
-        {
-            id: 4,
-            name: 'Silk Headband',
-            price: '699',
-            originalPrice: '1199',
-            discount: '42',
-            rating: 4.6,
-            reviews: 3182,
-            image: 'https://images.unsplash.com/photo-1621607510769-6be3c4e3dd5e?auto=format&fit=crop&q=80&w=400'
-        },
-        {
-            id: 5,
-            name: 'Pearl Hair Accessories Set',
-            price: '899',
-            originalPrice: '1499',
-            discount: '40',
-            rating: 4.4,
-            reviews: 2156,
-            image: 'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?auto=format&fit=crop&q=80&w=400'
-        },
-        {
-            id: 6,
-            name: 'Butterfly Hair Clip',
-            price: '349',
-            originalPrice: '599',
-            discount: '42',
-            rating: 4.2,
-            reviews: 1687,
-            image: 'https://images.unsplash.com/photo-1629198688000-71f23e745b6e?auto=format&fit=crop&q=80&w=400'
-        },
-        {
-            id: 7,
-            name: 'Vintage Hair Barrette',
-            price: '449',
-            originalPrice: '799',
-            discount: '44',
-            rating: 4.5,
-            reviews: 2934,
-            image: 'https://images.unsplash.com/photo-1532453288672-3a27e9be9efd?auto=format&fit=crop&q=80&w=400'
-        },
-        {
-            id: 8,
-            name: 'Satin Bow Hair Tie',
-            price: '249',
-            originalPrice: '499',
-            discount: '50',
-            rating: 4.3,
-            reviews: 1432,
-            image: 'https://images.unsplash.com/photo-1583292650898-7d22cd27ca6f?auto=format&fit=crop&q=80&w=400'
-        }
+const RelatedProducts = ({ currentCategory, currentProductId }) => {
+    const [products, setProducts] = useState([]);
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const fetchProducts = async () => {
+            try {
+                const res = await api.get("/api/products/all");
+                if (res.data.success) {
+                    setProducts(res.data.products);
+                }
+            } catch (err) {
+                console.error("Related products error", err);
+            }
+        };
+
+        fetchProducts();
+    }, []);
+
+    // 🔥 CATEGORY PRIORITY LOGIC
+    const sortedProducts = [
+        ...products.filter(
+            p => p.category === currentCategory && p._id !== currentProductId
+        ),
+        ...products.filter(
+            p => p.category !== currentCategory
+        )
     ];
-
     return (
         <div className="py-8 sm:py-12">
             <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6">
                 <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-6">You Might Also Like</h2>
-
                 {/* Products Grid */}
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-5">
-                    {products.map((product) => (
+                    {sortedProducts.slice(0, 8).map(product => (
+                        console.log("Rendering product:", product) ||
                         <div
-                            key={product.id}
+                            key={product._id}
+                            onClick={() => navigate(`/info/products/${product._id}`)}
                             className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-300 cursor-pointer group"
                         >
                             {/* Image Container */}
                             <div className="relative aspect-square bg-gray-100 overflow-hidden">
                                 <img
-                                    src={product.image}
-                                    alt={product.name}
+                                    src={product.images?.[0]?.url}
+                                    alt={product.title}
                                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                                 />
 
@@ -119,7 +66,7 @@ const RelatedProducts = () => {
                             {/* Product Info */}
                             <div className="p-3 sm:p-4">
                                 <h3 className="text-sm sm:text-base font-medium text-gray-900 line-clamp-2 mb-2 group-hover:text-orange-600 transition-colors">
-                                    {product.name}
+                                    {product.title}
                                 </h3>
 
                                 {/* Rating */}
@@ -128,14 +75,18 @@ const RelatedProducts = () => {
                                         <span className="font-semibold">{product.rating}</span>
                                         <Star size={10} className="ml-0.5 fill-white" />
                                     </div>
-                                    <span className="text-xs text-gray-500">({product.reviews.toLocaleString()})</span>
+                                    <span className="text-xs text-gray-500">
+                                        ({product.reviews ? product.reviews.toLocaleString() : "No reviews"})
+                                    </span>
                                 </div>
 
                                 {/* Price */}
-                                <div className="flex items-baseline gap-2 flex-wrap">
-                                    <span className="text-lg sm:text-xl font-semibold text-gray-900">₹{product.price}</span>
-                                    <span className="text-xs sm:text-sm text-gray-500 line-through">₹{product.originalPrice}</span>
-                                </div>
+                                <span className="text-lg font-semibold text-gray-900">
+                                    ₹{Math.floor(product.finalPrice)}
+                                </span>
+                                <span className="text-xs text-gray-500 line-through">
+                                    ₹{product.price}
+                                </span>
 
                                 {/* Prime Badge */}
                                 <div className="mt-2">

@@ -1,477 +1,359 @@
-import React, { useState } from 'react';
-import { Star, Truck, MapPin, ShieldCheck, RotateCcw, ChevronRight, Minus, Plus, Heart, Share2, ChevronDown, ChevronUp, Play } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { useParams } from "react-router-dom";
+import { useCart } from "../../context/CartContext.jsx";
+import { flyToCart } from "../../utils/flyToCart.js";
+import { useNavigate } from "react-router-dom";
+import api from "../../api/axios.js";
+import {
+    Star, Truck, MapPin, ShieldCheck, RotateCcw,
+    ChevronRight, Minus, Plus, Heart, Share2,
+    ChevronDown, ChevronUp, Lock
+} from "lucide-react";
 
 const ProductPage = () => {
+    const navigate = useNavigate();
+    const { id } = useParams();
+    const { addToCart } = useCart();
+
+    const [product, setProduct] = useState(null);
     const [activeMedia, setActiveMedia] = useState(0);
     const [quantity, setQuantity] = useState(1);
-    const [selectedColor, setSelectedColor] = useState('Dusty Rose');
-    const [selectedSize, setSelectedSize] = useState('Medium');
-    const [expandedSection, setExpandedSection] = useState('about');
-    const [isVideoPlaying, setIsVideoPlaying] = useState(false);
 
-    // Media including images and video
-    const productMedia = [
-        { type: 'image', url: "https://images.unsplash.com/photo-1596462502278-27bfdd403ea6?auto=format&fit=crop&q=80&w=800" },
-        { type: 'video', url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4", thumb: "https://images.unsplash.com/photo-1596462502278-27bfdd403ea6?auto=format&fit=crop&q=80&w=800" },
-        { type: 'image', url: "https://images.unsplash.com/photo-1596462502278-27bfdd403ea6?auto=format&fit=crop&q=80&w=800&sat=-100" },
-        { type: 'image', url: "https://images.unsplash.com/photo-1532453288672-3a27e9be9efd?auto=format&fit=crop&q=80&w=800" },
-        { type: 'image', url: "https://images.unsplash.com/photo-1629198688000-71f23e745b6e?auto=format&fit=crop&q=80&w=800" },
-        { type: 'image', url: "https://images.unsplash.com/photo-1535413089162-ef1f91c4ab8b?auto=format&fit=crop&q=80&w=800" },
-    ];
+    // 🔥 NEW STATE: About section dropdown ke liye
+    const [isAboutOpen, setIsAboutOpen] = useState(false);
 
-    const colors = [
-        { name: 'Dusty Rose', class: 'bg-pink-300', border: 'border-pink-400' },
-        { name: 'Steel Blue', class: 'bg-blue-400', border: 'border-blue-500' },
-        { name: 'Sage Green', class: 'bg-green-300', border: 'border-green-400' },
-        { name: 'Cream', class: 'bg-amber-100', border: 'border-amber-200' },
-    ];
+    // Zoom State
+    const [showZoom, setShowZoom] = useState(false);
+    const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
-    const sizes = ['Small', 'Medium', 'Large'];
+    const getInitialTime = () => {
+        return 12 * 60 * 60 + 30 * 60;
+    };
 
-    const toggleSection = (section) => {
-        setExpandedSection(expandedSection === section ? null : section);
+    const [timeLeft, setTimeLeft] = useState(getInitialTime());
+
+    useEffect(() => {
+        const timer = setInterval(() => {
+            setTimeLeft(prev => {
+                if (prev <= 1) {
+                    clearInterval(timer);
+                    return 0;
+                }
+                return prev - 1;
+            });
+        }, 1000);
+
+        return () => clearInterval(timer);
+    }, []);
+
+    const formatTime = (seconds) => {
+        const hrs = Math.floor(seconds / 3600);
+        const mins = Math.floor((seconds % 3600) / 60);
+        const secs = seconds % 60;
+        return `${hrs} hrs ${mins} mins ${secs} secs`;
+    };
+
+    useEffect(() => {
+        const fetchProduct = async () => {
+            try {
+                const res = await api.get(`/api/products/${id}`);
+                setProduct(res.data);
+            } catch (err) {
+                console.error("Product fetch error", err);
+            }
+        };
+
+        fetchProduct();
+    }, [id]);
+
+    if (!product) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-gray-100">
+                <div className="animate-pulse flex flex-col items-center">
+                    <div className="h-12 w-12 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+                    <p className="text-gray-600 font-medium">Loading Product...</p>
+                </div>
+            </div>
+        );
+    }
+
+    /* ---------- DATA PROCESSING ---------- */
+    const productMedia = product.images?.map(img => ({
+        type: "image",
+        url: img.url
+    })) || [];
+
+    /* ---------- ZOOM LOGIC ---------- */
+    const handleMouseMove = (e) => {
+        const { left, top, width, height } = e.target.getBoundingClientRect();
+        const x = ((e.pageX - left) / width) * 100;
+        const y = ((e.pageY - top) / height) * 100;
+        setMousePosition({ x, y });
+    };
+
+    const getDeliveryDate = (days = 5) => {
+        const date = new Date();
+        date.setDate(date.getDate() + days);
+        return date.toLocaleDateString("en-IN", {
+            weekday: "long",
+            day: "numeric",
+            month: "short",
+        });
     };
 
     return (
-        <div className="min-h-screen bg-white">
-            {/* Header Breadcrumbs */}
-            <div className="border-b border-gray-200 bg-white sticky top-0 z-10">
-                <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 py-2">
-                    <div className="flex items-center text-xs sm:text-sm text-gray-600 overflow-x-auto">
-                        <span className="hover:text-orange-600 cursor-pointer whitespace-nowrap">Home</span>
-                        <ChevronRight size={14} className="mx-1 shrink-0" />
-                        <span className="hover:text-orange-600 cursor-pointer whitespace-nowrap">Beauty & Personal Care</span>
-                        <ChevronRight size={14} className="mx-1 shrink-0" />
-                        <span className="hover:text-orange-600 cursor-pointer whitespace-nowrap">Hair Accessories</span>
-                        <ChevronRight size={14} className="mx-1 shrink-0" />
-                        <span className="text-orange-600 font-medium whitespace-nowrap">Hair Clips</span>
-                    </div>
+        <div className="min-h-screen bg-white font-sans text-gray-800 pb-10">
+
+            {/* Breadcrumb Navigation */}
+            <div className="bg-white py-2 px-4 border-b border-gray-200 text-xs text-gray-500">
+                <div className="max-w-[1500px] mx-auto flex items-center flex-wrap gap-1">
+                    <span className="hover:underline cursor-pointer">Home</span>
+                    <ChevronRight size={12} />
+                    <span className="hover:underline cursor-pointer">{product.category || "Products"}</span>
+                    <ChevronRight size={12} />
+                    <span className="font-semibold text-gray-700 truncate max-w-[200px]">{product.title}</span>
                 </div>
             </div>
 
-            <main className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 py-4">
-                <div className="lg:grid lg:grid-cols-12 lg:gap-6">
+            <main className="max-w-[1500px] mx-auto px-4 mt-6">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
 
-                    {/* LEFT: Media Gallery */}
-                    <div className="lg:col-span-5">
-                        <div className="sticky top-16">
-                            {/* Main Media Display */}
-                            <div className="relative aspect-square bg-gray-50 rounded-lg overflow-hidden border border-gray-200 mb-3">
-                                {productMedia[activeMedia].type === 'image' ? (
+                    {/* ---------------- LEFT COLUMN: IMAGES (5 Cols) ---------------- */}
+                    <div className="lg:col-span-5 flex flex-col-reverse lg:flex-row gap-4">
+                        {/* Thumbnails */}
+                        <div className="flex lg:flex-col gap-3 overflow-x-auto lg:overflow-y-auto lg:h-[500px] no-scrollbar py-2 lg:py-0 px-1">
+                            {productMedia.map((media, idx) => (
+                                <button
+                                    key={idx}
+                                    onMouseEnter={() => setActiveMedia(idx)}
+                                    onClick={() => setActiveMedia(idx)}
+                                    className={`relative w-16 h-16 lg:w-14 lg:h-14 shrink-0 border rounded-md overflow-hidden bg-white shadow-sm transition-all
+                                        ${activeMedia === idx ? "border-orange-500 ring-2 ring-orange-200 ring-offset-1" : "border-gray-300 hover:border-orange-400"}
+                                    `}
+                                >
+                                    <img ref={(el) => (product.imgRef = el)} src={media.url} className="w-full h-full object-contain p-1" alt="" />
+                                </button>
+                            ))}
+                        </div>
+
+                        {/* Main Image Stage */}
+                        <div className="flex-1 relative z-10 group">
+                            <div
+                                className="bg-white border border-gray-200 rounded-lg p-4 flex items-center justify-center h-[400px] lg:h-[550px] relative overflow-hidden cursor-crosshair"
+                                onMouseMove={handleMouseMove}
+                                onMouseEnter={() => setShowZoom(true)}
+                                onMouseLeave={() => setShowZoom(false)}
+                            >
+                                {productMedia[activeMedia] && (
                                     <img
                                         src={productMedia[activeMedia].url}
-                                        alt="Product"
-                                        className="w-full h-full object-cover"
+                                        alt={product.title}
+                                        className="max-w-full max-h-full object-contain transition-opacity duration-300"
                                     />
-                                ) : (
-                                    <div className="relative w-full h-full">
-                                        <video
-                                            src={productMedia[activeMedia].url}
-                                            className="w-full h-full object-cover"
-                                            controls
-                                            autoPlay
-                                            loop
-                                            muted
-                                        />
-                                    </div>
                                 )}
-
-                                {/* Wishlist & Share */}
-                                <div className="absolute top-3 right-3 flex gap-2">
-                                    <button className="p-2 bg-white rounded-full shadow-md hover:bg-gray-50">
-                                        <Heart size={18} />
+                                {/* Share & Wishlist Icons */}
+                                <div className="absolute top-4 right-4 flex flex-col gap-3 z-20">
+                                    <button className="p-2 bg-white rounded-full shadow-md text-gray-400 hover:text-red-500 transition-colors border border-gray-100">
+                                        <Heart size={20} />
                                     </button>
-                                    <button className="p-2 bg-white rounded-full shadow-md hover:bg-gray-50">
-                                        <Share2 size={18} />
+                                    <button className="p-2 bg-white rounded-full shadow-md text-gray-400 hover:text-blue-500 transition-colors border border-gray-100">
+                                        <Share2 size={20} />
                                     </button>
                                 </div>
                             </div>
-
-                            {/* Thumbnails */}
-                            <div className="grid grid-cols-6 gap-2 overflow-x-auto pb-2">
-                                {productMedia.map((media, idx) => (
-                                    <button
-                                        key={idx}
-                                        onClick={() => setActiveMedia(idx)}
-                                        className={`relative aspect-square rounded border-2 overflow-hidden shrink-0 ${activeMedia === idx ? 'border-orange-500' : 'border-gray-200'
-                                            }`}
-                                    >
-                                        <img
-                                            src={media.type === 'video' ? media.thumb : media.url}
-                                            alt={`View ${idx + 1}`}
-                                            className="w-full h-full object-cover"
-                                        />
-                                        {media.type === 'video' && (
-                                            <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center">
-                                                <Play size={16} className="text-white fill-white" />
-                                            </div>
-                                        )}
-                                    </button>
-                                ))}
-                            </div>
+                            {/* ZOOM RESULT */}
+                            {showZoom && (
+                                <div
+                                    className="hidden lg:block absolute left-[105%] top-0 w-[500px] h-[550px] bg-white border border-gray-300 shadow-2xl z-50 rounded-md overflow-hidden"
+                                    style={{
+                                        backgroundImage: `url(${productMedia[activeMedia]?.url})`,
+                                        backgroundPosition: `${mousePosition.x}% ${mousePosition.y}%`,
+                                        backgroundSize: "250%"
+                                    }}
+                                ></div>
+                            )}
                         </div>
                     </div>
 
-                    {/* RIGHT: Product Details */}
-                    <div className="lg:col-span-7 mt-6 lg:mt-0">
-                        {/* Brand & Title */}
-                        <div className="mb-2">
-                            <a href="#" className="text-sm text-blue-600 hover:text-orange-600 hover:underline">Visit the Elegant Accessories Store</a>
+                    {/* ---------------- MIDDLE COLUMN: DETAILS (4 Cols) ---------------- */}
+                    <div className="lg:col-span-4 flex flex-col gap-4">
+                        <div>
+                            <button onClick={() => navigate(`/shop/${product.category}`)} className="text-sm text-[#007185] hover:underline hover:text-[#c7511f] font-medium cursor-pointer">
+                                Visit the {product.category || "Growfinix Store"} Store
+                            </button>
+                            <h1 className="text-2xl lg:text-3xl font-medium text-gray-900 leading-snug mt-1">
+                                {product.title}
+                            </h1>
                         </div>
-
-                        <h1 className="text-xl sm:text-2xl font-normal text-gray-900 mb-3">
-                            The Velvet Pearl Hair Clip - Premium Quality Handmade Hair Accessory with Faux Pearls for Women and Girls
-                        </h1>
 
                         {/* Rating */}
-                        <div className="flex items-center gap-3 mb-4 flex-wrap">
+                        <div className="flex items-center gap-2 border-b border-gray-200 pb-4">
                             <div className="flex items-center">
-                                <span className="text-sm font-medium text-gray-900 mr-1">4.5</span>
-                                <div className="flex">
-                                    {[0, 1, 2, 3, 4].map((rating) => (
-                                        <Star key={rating} size={16} className={`${rating < 4 ? 'text-orange-400 fill-orange-400' : 'text-gray-300 fill-gray-300'}`} />
-                                    ))}
-                                </div>
-                            </div>
-                            <a href="#reviews" className="text-sm text-blue-600 hover:text-orange-600 hover:underline">
-                                6,128 ratings
-                            </a>
-                            <span className="text-gray-400">|</span>
-                            <span className="text-sm text-gray-600">500+ bought in past month</span>
-                        </div>
-
-                        <div className="border-t border-gray-200 pt-4 mb-4"></div>
-
-                        {/* Price */}
-                        <div className="mb-4">
-                            <div className="flex items-baseline gap-2 flex-wrap">
-                                <span className="text-xs text-gray-600">M.R.P.:</span>
-                                <span className="text-sm text-gray-500 line-through">₹1,299</span>
-                            </div>
-                            <div className="flex items-baseline gap-3 flex-wrap">
-                                <span className="text-2xl sm:text-3xl text-red-700">-31%</span>
-                                <div className="flex items-baseline gap-1">
-                                    <span className="text-xs">₹</span>
-                                    <span className="text-3xl sm:text-4xl font-normal">899</span>
-                                </div>
-                            </div>
-                            <p className="text-xs text-gray-600 mt-1">Inclusive of all taxes</p>
-                            <p className="text-xs text-teal-700 mt-1">Save extra with no cost EMI</p>
-                        </div>
-
-                        <div className="border-t border-gray-200 pt-4 mb-4"></div>
-
-                        {/* Offers */}
-                        <div className="mb-4 bg-gray-50 p-3 rounded">
-                            <h3 className="text-sm font-semibold text-gray-900 mb-2">Offers</h3>
-                            <div className="space-y-2 text-sm">
-                                <div className="flex items-start gap-2">
-                                    <span className="px-2 py-0.5 bg-red-600 text-white text-xs rounded">Bank Offer</span>
-                                    <span className="text-gray-700">5% Instant Discount up to ₹250 on HDFC Bank Cards</span>
-                                </div>
-                                <div className="flex items-start gap-2">
-                                    <span className="px-2 py-0.5 bg-red-600 text-white text-xs rounded">Partner Offers</span>
-                                    <span className="text-gray-700">Get GST invoice and save up to 28% on business purchases</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Color Selection */}
-                        <div className="mb-4">
-                            <h3 className="text-sm font-semibold text-gray-900 mb-2">
-                                Colour: <span className="font-normal text-gray-700">{selectedColor}</span>
-                            </h3>
-                            <div className="flex items-center gap-2 flex-wrap">
-                                {colors.map((color) => (
-                                    <button
-                                        key={color.name}
-                                        onClick={() => setSelectedColor(color.name)}
-                                        className={`h-10 w-10 rounded-full border-2 ${color.class} ${selectedColor === color.name ? `${color.border} ring-2 ring-offset-1 ring-gray-400` : 'border-gray-300'
-                                            }`}
-                                        title={color.name}
-                                    />
+                                {[...Array(5)].map((_, i) => (
+                                    <Star key={i} size={16} className={i < 4 ? "text-yellow-500 fill-yellow-500" : "text-gray-300"} />
                                 ))}
                             </div>
+                            <span className="text-sm text-[#007185] hover:underline cursor-pointer">1,240 ratings</span>
                         </div>
 
-                        {/* Size Selection */}
-                        <div className="mb-4">
-                            <h3 className="text-sm font-semibold text-gray-900 mb-2">
-                                Size: <span className="font-normal text-gray-700">{selectedSize}</span>
-                            </h3>
-                            <div className="flex items-center gap-2 flex-wrap">
-                                {sizes.map((size) => (
-                                    <button
-                                        key={size}
-                                        onClick={() => setSelectedSize(size)}
-                                        className={`px-4 py-2 border rounded text-sm ${selectedSize === size
-                                                ? 'border-orange-500 bg-orange-50 text-orange-700'
-                                                : 'border-gray-300 hover:bg-gray-50'
-                                            }`}
-                                    >
-                                        {size}
-                                    </button>
-                                ))}
+                        {/* Price Block */}
+                        <div className="space-y-1">
+                            {product.discount > 0 && (
+                                <div className="text-sm text-red-700 font-medium">
+                                    -{product.discount}% <span className="text-gray-500 line-through font-normal ml-1">₹{product.price}</span>
+                                </div>
+                            )}
+                            <div className="flex items-start">
+                                <span className="text-sm mt-1 relative top-1">₹</span>
+                                <span className="text-3xl font-medium text-gray-900">{Math.floor(product.finalPrice || product.price)}</span>
+                                <span className="text-sm mt-1 relative top-1">00</span>
                             </div>
+                            <p className="text-sm text-gray-600">Inclusive of all taxes</p>
                         </div>
 
-                        <div className="border-t border-gray-200 pt-4 mb-4"></div>
-
-                        {/* Key Features */}
-                        <div className="mb-4 space-y-2">
-                            <div className="flex items-start gap-3">
-                                <ShieldCheck size={20} className="text-teal-600 shrink-0 mt-0.5" />
-                                <div>
-                                    <p className="text-sm font-medium text-gray-900">Secure transaction</p>
-                                    <p className="text-xs text-gray-600">Your transaction is secure with end-to-end encryption</p>
+                        {/* Feature Icons */}
+                        <div className="flex gap-4 py-4 overflow-x-auto no-scrollbar">
+                            {[
+                                { icon: <RotateCcw size={20} />, text: "7 days Returnable" },
+                                { icon: <Truck size={20} />, text: "Free Delivery" },
+                                { icon: <ShieldCheck size={20} />, text: "1 Year Warranty" },
+                                { icon: <MapPin size={20} />, text: "Pay on Delivery" },
+                            ].map((item, i) => (
+                                <div key={i} className="min-w-20 flex flex-col items-center text-center gap-2">
+                                    <div className="w-10 h-10 rounded-full bg-white border border-gray-200 flex items-center justify-center text-[#007185]">
+                                        {item.icon}
+                                    </div>
+                                    <span className="text-[11px] text-[#007185] font-medium leading-tight">{item.text}</span>
                                 </div>
-                            </div>
-                            <div className="flex items-start gap-3">
-                                <Truck size={20} className="text-teal-600 shrink-0 mt-0.5" />
-                                <div>
-                                    <p className="text-sm font-medium text-teal-700">FREE delivery</p>
-                                    <p className="text-xs text-gray-600">Tomorrow, 10 AM - 9 PM. Order within <span className="text-green-700 font-medium">4 hrs 23 mins</span></p>
-                                </div>
-                            </div>
-                            <div className="flex items-start gap-3">
-                                <MapPin size={20} className="text-gray-400 shrink-0 mt-0.5" />
-                                <div className="flex items-center gap-2">
-                                    <p className="text-sm text-blue-600 hover:text-orange-600 hover:underline cursor-pointer">Select delivery location</p>
-                                </div>
-                            </div>
-                            <div className="flex items-start gap-3">
-                                <RotateCcw size={20} className="text-teal-600 shrink-0 mt-0.5" />
-                                <div>
-                                    <p className="text-sm font-medium text-gray-900">7 days return policy</p>
-                                    <p className="text-xs text-gray-600">Easy returns and refunds available</p>
-                                </div>
-                            </div>
+                            ))}
                         </div>
 
-                        <div className="border-t border-gray-200 pt-4 mb-4"></div>
+                        <hr className="border-gray-200" />
 
-                        {/* Stock & Quantity */}
-                        <div className="mb-4">
-                            <p className="text-lg text-green-700 font-medium mb-3">In Stock</p>
-                            <div className="flex items-center gap-3 flex-wrap">
-                                <div className="flex items-center border border-gray-300 rounded-lg bg-gray-50">
-                                    <button
-                                        onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                                        className="px-3 py-2 hover:bg-gray-200 rounded-l-lg"
-                                    >
-                                        <Minus size={18} />
-                                    </button>
-                                    <span className="px-4 py-2 min-w-[50px] text-center font-medium bg-white">{quantity}</span>
-                                    <button
-                                        onClick={() => setQuantity(quantity + 1)}
-                                        className="px-3 py-2 hover:bg-gray-200 rounded-r-lg"
-                                    >
-                                        <Plus size={18} />
-                                    </button>
-                                </div>
-                                <span className="text-xs text-gray-600">Quantity</span>
-                            </div>
-                        </div>
-
-                        {/* Action Buttons */}
-                        <div className="space-y-3 mb-6">
-                            <button className="w-full bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-medium py-3 px-6 rounded-full shadow-md transition-colors">
-                                Add to Cart
+                        {/* 🔥 MODIFIED: About Section with Dropdown/Accordion 🔥 */}
+                        <div className="border border-gray-200 rounded-lg overflow-hidden">
+                            <button
+                                onClick={() => setIsAboutOpen(!isAboutOpen)}
+                                className="w-full flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 transition-colors duration-200 text-left"
+                            >
+                                <h3 className="font-bold text-gray-900">About this item</h3>
+                                {isAboutOpen ? (
+                                    <ChevronUp className="text-gray-500" size={20} />
+                                ) : (
+                                    <ChevronDown className="text-gray-500" size={20} />
+                                )}
                             </button>
-                            <button className="w-full bg-orange-500 hover:bg-orange-600 text-white font-medium py-3 px-6 rounded-full shadow-md transition-colors">
-                                Buy Now
-                            </button>
-                        </div>
 
-                        <div className="border-t border-gray-200 pt-4"></div>
-
-                        {/* Collapsible Sections */}
-                        <div className="mt-6 space-y-3">
-                            {/* About this item */}
-                            <div className="border border-gray-200 rounded-lg">
-                                <button
-                                    onClick={() => toggleSection('about')}
-                                    className="w-full flex items-center justify-between p-4 text-left hover:bg-gray-50"
-                                >
-                                    <h3 className="font-semibold text-gray-900">About this item</h3>
-                                    {expandedSection === 'about' ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
-                                </button>
-                                {expandedSection === 'about' && (
-                                    <div className="px-4 pb-4 text-sm text-gray-700 space-y-2">
-                                        <ul className="list-disc pl-5 space-y-1">
-                                            <li>Premium quality velvet material with soft touch finish for comfortable all-day wear</li>
-                                            <li>Adorned with elegant faux pearls that add a touch of sophistication to any hairstyle</li>
-                                            <li>Strong alloy clip ensures secure hold without damaging your hair</li>
-                                            <li>Perfect for parties, weddings, daily wear, and special occasions</li>
-                                            <li>Handmade with attention to detail and quality craftsmanship</li>
-                                            <li>Suitable for all hair types - thin, thick, straight, curly or wavy hair</li>
-                                            <li>Dimensions: 4.5" x 2.5" | Weight: 24g - lightweight and comfortable</li>
-                                        </ul>
-                                    </div>
-                                )}
-                            </div>
-
-                            {/* Product Description */}
-                            <div className="border border-gray-200 rounded-lg">
-                                <button
-                                    onClick={() => toggleSection('description')}
-                                    className="w-full flex items-center justify-between p-4 text-left hover:bg-gray-50"
-                                >
-                                    <h3 className="font-semibold text-gray-900">Product Description</h3>
-                                    {expandedSection === 'description' ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
-                                </button>
-                                {expandedSection === 'description' && (
-                                    <div className="px-4 pb-4 text-sm text-gray-700 space-y-3">
-                                        <p>
-                                            Elevate your hairstyle with our exquisite Velvet Pearl Hair Clip, a perfect blend of elegance and functionality. Crafted from premium, soft-touch velvet fabric and adorned with carefully selected faux pearls, this accessory brings timeless sophistication to any look.
-                                        </p>
-                                        <p>
-                                            Whether you're heading to a wedding, attending a party, or simply want to add a chic accent to your everyday style, this versatile hair clip is your perfect companion. The strong alloy clip mechanism ensures your hair stays perfectly in place throughout the day without causing any damage or discomfort.
-                                        </p>
-                                        <p>
-                                            Each piece is handmade with meticulous attention to detail, ensuring that you receive a product of the highest quality. The lightweight design (just 24g) means you can wear it comfortably for hours without any strain.
-                                        </p>
-                                        <p className="font-medium">Care Instructions:</p>
-                                        <ul className="list-disc pl-5 space-y-1">
-                                            <li>Keep away from water and moisture</li>
-                                            <li>Store in a cool, dry place</li>
-                                            <li>Clean gently with a soft, dry cloth</li>
-                                            <li>Avoid contact with perfumes and chemicals</li>
-                                        </ul>
-                                    </div>
-                                )}
-                            </div>
-
-                            {/* Specifications */}
-                            <div className="border border-gray-200 rounded-lg">
-                                <button
-                                    onClick={() => toggleSection('specs')}
-                                    className="w-full flex items-center justify-between p-4 text-left hover:bg-gray-50"
-                                >
-                                    <h3 className="font-semibold text-gray-900">Technical Details</h3>
-                                    {expandedSection === 'specs' ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
-                                </button>
-                                {expandedSection === 'specs' && (
-                                    <div className="px-4 pb-4">
-                                        <table className="w-full text-sm">
-                                            <tbody className="divide-y divide-gray-200">
-                                                <tr>
-                                                    <td className="py-2 text-gray-600 font-medium">Brand</td>
-                                                    <td className="py-2 text-gray-900">Elegant Accessories</td>
-                                                </tr>
-                                                <tr>
-                                                    <td className="py-2 text-gray-600 font-medium">Material</td>
-                                                    <td className="py-2 text-gray-900">Velvet, Faux Pearl, Alloy</td>
-                                                </tr>
-                                                <tr>
-                                                    <td className="py-2 text-gray-600 font-medium">Dimensions</td>
-                                                    <td className="py-2 text-gray-900">4.5" x 2.5" x 0.5"</td>
-                                                </tr>
-                                                <tr>
-                                                    <td className="py-2 text-gray-600 font-medium">Weight</td>
-                                                    <td className="py-2 text-gray-900">24 grams</td>
-                                                </tr>
-                                                <tr>
-                                                    <td className="py-2 text-gray-600 font-medium">Colour</td>
-                                                    <td className="py-2 text-gray-900">{selectedColor}</td>
-                                                </tr>
-                                                <tr>
-                                                    <td className="py-2 text-gray-600 font-medium">Item Part Number</td>
-                                                    <td className="py-2 text-gray-900">VPC-001-DR</td>
-                                                </tr>
-                                                <tr>
-                                                    <td className="py-2 text-gray-600 font-medium">Country of Origin</td>
-                                                    <td className="py-2 text-gray-900">India</td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Customer Reviews Section */}
-                <div className="mt-12 border-t border-gray-200 pt-8">
-                    <h2 className="text-2xl font-semibold text-gray-900 mb-6">Customer reviews</h2>
-
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
-                        <div className="md:col-span-1">
-                            <div className="flex items-center gap-3 mb-4">
-                                <span className="text-5xl font-normal text-gray-900">4.5</span>
-                                <div>
-                                    <div className="flex text-orange-400 mb-1">
-                                        {[0, 1, 2, 3, 4].map((i) => (
-                                            <Star key={i} size={18} className={i < 4 ? 'fill-orange-400' : 'fill-gray-300 text-gray-300'} />
-                                        ))}
-                                    </div>
-                                    <p className="text-sm text-gray-600">6,128 global ratings</p>
+                            <div
+                                className={`transition-all duration-300 ease-in-out overflow-hidden ${isAboutOpen ? "max-h-[1000px] opacity-100" : "max-h-0 opacity-0"
+                                    }`}
+                            >
+                                <div className="p-4 bg-white border-t border-gray-100 text-sm text-gray-700 space-y-2">
+                                    <p>{product.description || "No description available."}</p>
+                                    <ul className="list-disc pl-5 space-y-1 mt-2">
+                                        <li>High quality material ensures durability.</li>
+                                        <li>Designed for maximum comfort and style.</li>
+                                        <li>Perfect for daily use or special occasions.</li>
+                                        <li>Premium finish and long-lasting quality.</li>
+                                    </ul>
                                 </div>
                             </div>
                         </div>
 
-                        <div className="md:col-span-2">
-                            <div className="space-y-2">
-                                {[
-                                    { stars: 5, percent: 64 },
-                                    { stars: 4, percent: 21 },
-                                    { stars: 3, percent: 9 },
-                                    { stars: 2, percent: 4 },
-                                    { stars: 1, percent: 2 },
-                                ].map((item) => (
-                                    <div key={item.stars} className="flex items-center gap-3 text-sm">
-                                        <span className="w-16 text-blue-600 hover:text-orange-600 cursor-pointer">{item.stars} star</span>
-                                        <div className="flex-1 h-5 bg-gray-200 rounded overflow-hidden">
-                                            <div
-                                                className="h-full bg-orange-400"
-                                                style={{ width: `${item.percent}%` }}
-                                            />
-                                        </div>
-                                        <span className="w-12 text-right text-gray-600">{item.percent}%</span>
-                                    </div>
-                                ))}
+                    </div>
+
+                    {/* ---------------- RIGHT COLUMN: BUY BOX (3 Cols) ---------------- */}
+                    <div className="lg:col-span-3">
+                        <div className="border border-gray-300 rounded-lg p-5 bg-white shadow-sm sticky top-24">
+
+                            <div className="text-2xl font-medium text-gray-900 mb-2">
+                                ₹{Math.floor(product.finalPrice || product.price)}
+                            </div>
+
+                            <div className="text-sm text-[#007185] mb-4">
+                                <a href="#" className="hover:underline">Lowest delivery charges</a>
+                                <span className="text-gray-600 ml-1">{getDeliveryDate(5)}</span>
+                                <br />
+                                <span className="text-gray-900 font-medium">
+                                    Order within{" "}
+                                    <span className="text-green-700">{formatTime(timeLeft)}</span>
+                                </span>
+                            </div>
+
+                            <div className="text-lg text-green-700 font-medium mb-4">
+                                {product.quantity > 0 ? "In Stock" : "Currently Unavailable"}
+                            </div>
+
+                            <div className="text-xs text-gray-600 mb-4 space-y-1">
+                                <div className="grid grid-cols-2">
+                                    <span>Ships from</span>
+                                    <span className="text-gray-900 font-medium truncate">Growfinix</span>
+                                </div>
+                                <div className="grid grid-cols-2">
+                                    <span>Sold by</span>
+                                    <span className="text-[#007185] font-medium truncate">Growfinix Retail</span>
+                                </div>
+                            </div>
+
+                            {/* Quantity */}
+                            <div className="flex items-center gap-2 mb-4">
+                                <span className="text-sm text-gray-600">Quantity:</span>
+                                <div className="flex items-center border rounded shadow-sm bg-gray-50">
+                                    <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="px-3 py-1 hover:bg-gray-200 rounded-l">
+                                        <Minus size={14} />
+                                    </button>
+                                    <span className="px-3 py-1 font-medium bg-white text-gray-900">{quantity}</span>
+                                    <button onClick={() => setQuantity(quantity + 1)} className="px-3 py-1 hover:bg-gray-200 rounded-r">
+                                        <Plus size={14} />
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* Action Buttons */}
+                            <div className="space-y-3">
+                                <button
+                                    onClick={() => {
+                                        flyToCart(product.imgRef);
+                                        addToCart({
+                                            id: product._id,
+                                            name: product.title,
+                                            price: product.finalPrice,
+                                            image: product.images?.[0]?.url,
+                                            quantity: quantity,
+                                        });
+                                    }}
+                                    className="w-full bg-[#FFD814] hover:bg-[#F7CA00] border border-[#FCD200] text-black py-2.5 rounded-full text-sm shadow-sm transition-colors cursor-pointer">
+                                    Add to Cart
+                                </button>
+                                <button className="w-full bg-[#FA8900] hover:bg-[#E37B00] border border-[#E37B00] text-white py-2.5 rounded-full text-sm shadow-sm transition-colors cursor-pointer">
+                                    Buy Now
+                                </button>
+                            </div>
+
+                            <div className="flex items-center gap-2 mt-4 text-gray-500 text-xs">
+                                <Lock size={12} />
+                                <span>Secure transaction</span>
                             </div>
                         </div>
                     </div>
 
-                    {/* Sample Review */}
-                    <div className="border-t border-gray-200 pt-6">
-                        <div className="space-y-6">
-                            <div className="bg-white">
-                                <div className="flex items-start gap-3 mb-2">
-                                    <div className="w-10 h-10 bg-gray-900 text-white rounded-full flex items-center justify-center font-medium">
-                                        P
-                                    </div>
-                                    <div>
-                                        <p className="font-medium text-gray-900">Priya Sharma</p>
-                                        <div className="flex items-center gap-2 mt-1">
-                                            <div className="flex text-orange-400">
-                                                {[0, 1, 2, 3, 4].map((i) => (
-                                                    <Star key={i} size={14} className="fill-orange-400" />
-                                                ))}
-                                            </div>
-                                            <span className="text-sm font-semibold text-gray-900">Excellent quality!</span>
-                                        </div>
-                                        <p className="text-xs text-gray-500 mt-1">Reviewed in India on 10 December 2025</p>
-                                        <p className="text-xs text-gray-500">Colour: Dusty Rose | Size: Medium | Verified Purchase</p>
-                                    </div>
-                                </div>
-                                <div className="ml-13 mt-3">
-                                    <p className="text-sm text-gray-700 leading-relaxed">
-                                        Absolutely love this hair clip! The velvet material feels premium and the pearls look so elegant. It holds my thick hair perfectly without slipping. I've received so many compliments when wearing it. Great value for money and fast delivery. Highly recommend!
-                                    </p>
-                                    <div className="flex items-center gap-4 mt-3 text-xs">
-                                        <button className="text-gray-600 hover:text-gray-900">Helpful</button>
-                                        <span className="text-gray-400">|</span>
-                                        <button className="text-gray-600 hover:text-gray-900">Report</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </main>
+
+            {/* Mobile Sticky Buy Button */}
+            <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-3 flex items-center gap-3 z-50 pb-safe">
+                <div className="flex-1">
+                    <button className="w-full bg-[#FFD814] text-black font-medium py-3 rounded-full text-sm shadow-sm">
+                        Add to Cart
+                    </button>
+                </div>
+                <div className="flex-1">
+                    <button className="w-full bg-[#FA8900] text-white font-medium py-3 rounded-full text-sm shadow-sm">
+                        Buy Now
+                    </button>
+                </div>
+            </div>
         </div>
     );
 };
