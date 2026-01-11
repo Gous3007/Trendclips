@@ -2,9 +2,8 @@ const express = require("express");
 const cors = require("cors");
 const path = require("path");
 require("dotenv").config();
-require("./config/db.js")(); // DB connect
+require("./config/db.js")();
 
-// Routes
 const EditProductRoute = require("./routes/editProduct.routes.js");
 const ShowcaseRoute = require("./routes/showcaseRoutes.js");
 
@@ -18,7 +17,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // --------------------
-// API Routes
+// API Routes (FIRST)
 // --------------------
 app.use("/api/users", require("./routes/user.js"));
 app.use("/api/products", require("./routes/productRoutes"));
@@ -26,14 +25,14 @@ app.use("/api/edit", EditProductRoute);
 app.use("/api/showcase", ShowcaseRoute);
 
 // --------------------
-// React Frontend Serve (Production)
+// React Build Serve
 // --------------------
 app.use(express.static(path.join(__dirname, "dist")));
 
 // --------------------
-// SPA Fallback (IMPORTANT)
+// SPA Fallback (FIXED ✅)
 // --------------------
-app.get("*", (req, res) => {
+app.use((req, res) => {
     res.sendFile(path.join(__dirname, "dist", "index.html"));
 });
 
