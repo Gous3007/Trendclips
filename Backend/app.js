@@ -8,6 +8,7 @@ const EditProductRoute = require("./routes/editProduct.routes.js");
 const ShowcaseRoute = require("./routes/showcaseRoutes.js");
 
 const app = express();
+console.log("API BASE URL 👉", import.meta.env.VITE_API_BASE_URL);
 
 // --------------------
 // Middlewares
