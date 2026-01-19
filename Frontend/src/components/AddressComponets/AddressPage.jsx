@@ -1,201 +1,281 @@
-import React, { useState } from 'react';
-import {
-    MapPin,
-    Plus,
-    Home,
-    Briefcase,
-    MoreVertical,
-    Phone,
-    CheckCircle2,
-    ArrowRight,
-    ArrowLeft
-} from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Plus, ChevronRight, ChevronDown, ChevronUp } from 'lucide-react';
+import { useLocation, useNavigate } from "react-router-dom";
+import AddAddressModal from "./AddAddressModal";
+import api from "../../api/axios";
+import { getGuestId } from "../../utils/guest";
 
 const AddressPage = () => {
-    const [selectedAddress, setSelectedAddress] = useState(1); // Default selected address ID
+    const navigate = useNavigate();
+    const location = useLocation();
 
-    // Mock Address Data
-    const addresses = [
-        {
-            id: 1,
-            type: 'Home',
-            name: 'Gous Choudhary', // Using context aware name or generic
-            phone: '+91 98765 43210',
-            addressLine1: 'Flat 402, Krishna Heights',
-            addressLine2: 'Near City Mall, Bandra West',
-            city: 'Mumbai',
-            state: 'Maharashtra',
-            pincode: '400050',
-            isDefault: true
-        },
-        {
-            id: 2,
-            type: 'Work',
-            name: 'Gous Choudhary',
-            phone: '+91 98765 43210',
-            addressLine1: 'Growfinix Tech Hub, Office 204',
-            addressLine2: 'Tech Park, Hinjewadi Phase 1',
-            city: 'Pune',
-            state: 'Maharashtra',
-            pincode: '411057',
-            isDefault: false
+    // 🛒 Cart Data
+    const {
+        cartItems = [],
+        subtotal: passedSubtotal,
+        deliveryFee: passedDeliveryFee,
+        finalTotal: passedFinalTotal,
+        buyNow = false,
+    } = location.state || {};
+
+    // 🧮 Common calculation (cart & buy now dono ke liye)
+    const calculatedSubtotal = cartItems.reduce(
+        (acc, item) => acc + item.price * item.quantity,
+        0
+    );
+
+    const totalMRP = cartItems.reduce(
+        (acc, item) => acc + item.mrp * item.quantity,
+        0
+    );
+
+    const totalSavings = totalMRP - calculatedSubtotal;
+
+    // 🔀 FINAL DECISION
+    const subtotal = buyNow ? calculatedSubtotal : passedSubtotal;
+    const deliveryFee = buyNow ? 70 : passedDeliveryFee;
+    const finalTotal = buyNow
+        ? calculatedSubtotal + 70
+        : passedFinalTotal;
+
+    // 🏠 Address State
+    const [addresses, setAddresses] = useState([]);
+
+    useEffect(() => {
+        const loadAddresses = async () => {
+            const guestId = getGuestId();
+            const res = await api.get(`/api/address/${guestId}`);
+
+            setAddresses(res.data.addresses || []);
+
+            if (res.data.addresses?.length > 0) {
+                setSelectedAddressId(res.data.addresses[0]._id);
+            }
+        };
+        loadAddresses();
+    }, []);
+
+    const [selectedAddressId, setSelectedAddressId] = useState(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [showMobileSummary, setShowMobileSummary] = useState(false); // Toggle for mobile summary
+
+    // ➕ Add Address Logic
+    const handleAddNewAddress = async (newAddrData) => {
+        const guestId = getGuestId();
+
+        const res = await api.post("/api/address", {
+            guestId,
+            ...newAddrData
+        });
+
+        setAddresses(res.data.addresses);
+        setSelectedAddressId(res.data.addresses[0]._id);
+    };
+
+    const handleProceed = () => {
+        if (!selectedAddressId) {
+            alert("Please select an address");
+            return;
         }
-    ];
 
-    return (
-        <div className="min-h-screen bg-gray-50/50 py-6 px-4 sm:px-6 lg:px-8 font-sans">
-            <div className="max-w-5xl mx-auto">
+        const selectedAddr = addresses.find(a => a._id === selectedAddressId);
 
-                {/* Header / Breadcrumbs */}
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
-                    <button className="flex items-center text-gray-600 hover:text-gray-900 transition-colors md:hidden">
-                        <ArrowLeft className="w-5 h-5 mr-2" /> Back
-                    </button>
+        navigate("/payment", {
+            state: {
+                cartItems,
+                subtotal,
+                deliveryFee,
+                finalTotal,
+                shippingAddress: selectedAddr,
+                buyNow // 🔥 pass it forward
+            }
+        });
+    };
 
-                    <div className="hidden md:flex items-center text-sm font-medium text-gray-500">
-                        <span>Cart</span>
-                        <span className="mx-3 text-gray-300">/</span>
-                        <span className="text-blue-600 font-semibold">Address</span>
-                        <span className="mx-3 text-gray-300">/</span>
-                        <span>Payment</span>
+    // 📦 Reusable Order Summary Component
+    const OrderSummaryCard = ({ isMobile }) => (
+        <div className={`bg-white rounded-lg border border-gray-200 shadow-sm ${isMobile ? 'mb-4' : 'sticky top-20'}`}>
+
+            {/* Mobile Toggle Header */}
+            {isMobile && (
+                <div
+                    onClick={() => setShowMobileSummary(!showMobileSummary)}
+                    className="p-4 flex justify-between items-center cursor-pointer bg-gray-50 border-b"
+                >
+                    <div className="flex items-center gap-2">
+                        <span className="font-bold text-gray-800">Order Summary</span>
+                        <span className="text-gray-500 text-sm">({cartItems.length} items)</span>
                     </div>
+                    {showMobileSummary ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                </div>
+            )}
 
-                    <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">
-                        Select Delivery Address
-                    </h1>
+            {/* Content Body (Hidden on mobile if toggled off, visible on desktop) */}
+            <div className={`p-5 ${isMobile && !showMobileSummary ? 'hidden' : 'block'}`}>
+
+                {/* 🖼️ IMAGE PREVIEW (The feature you asked for) */}
+                <div className="flex items-center gap-2 mb-6 overflow-x-auto pb-2 scrollbar-hide">
+                    <div className="flex -space-x-3">
+                        {cartItems.slice(0, 4).map((item, idx) => (
+                            <div key={idx} className="relative w-12 h-12 rounded-full border-2 border-white bg-white shadow-sm overflow-hidden z-10 hover:z-20 transition-all">
+                                <img
+                                    src={item.image}
+                                    alt={item.name}
+                                    className="w-full h-full object-cover"
+                                />
+                            </div>
+                        ))}
+                        {cartItems.length > 4 && (
+                            <div className="w-12 h-12 rounded-full border-2 border-white bg-gray-200 flex items-center justify-center text-xs font-bold text-gray-600 z-0">
+                                +{cartItems.length - 4}
+                            </div>
+                        )}
+                    </div>
+                    <span className="text-xs text-gray-500 ml-2">Review items</span>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
+                {/* Button (Desktop Only) */}
+                {!isMobile && (
+                    <button onClick={handleProceed} className="w-full bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-medium py-2 rounded-lg shadow-sm mb-4 border border-yellow-500">
+                        Use this address
+                    </button>
+                )}
 
-                    {/* LEFT COLUMN: Address List */}
-                    <div className="lg:col-span-8 space-y-5 order-2 lg:order-1">
+                {/* Price Details */}
+                <div className={`${!isMobile ? 'border-t pt-4' : ''}`}>
+                    {!isMobile && <h3 className="font-bold text-gray-800 mb-2">Order Summary</h3>}
 
-                        {/* Add New Address Button */}
-                        <button className="w-full flex items-center justify-between p-5 bg-white border border-blue-200 hover:border-blue-400 rounded-xl shadow-sm text-blue-600 hover:bg-blue-50 transition-all duration-200 group dashed-border">
-                            <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center group-hover:scale-110 transition-transform">
-                                    <Plus className="w-5 h-5" />
-                                </div>
-                                <div className="text-left">
-                                    <span className="block font-semibold text-gray-900">Add New Address</span>
-                                    <span className="text-xs text-gray-500">Deliver to a different location</span>
-                                </div>
-                            </div>
-                            <ArrowRight className="w-5 h-5 opacity-0 group-hover:opacity-100 transition-opacity transform group-hover:translate-x-1" />
-                        </button>
-
-                        <div className="space-y-4">
-                            <h2 className="text-sm font-bold text-gray-500 uppercase tracking-wider px-1">Saved Addresses</h2>
-
-                            {addresses.map((addr) => (
-                                <div
-                                    key={addr.id}
-                                    onClick={() => setSelectedAddress(addr.id)}
-                                    className={`
-                                        relative bg-white p-5 rounded-2xl border-2 cursor-pointer transition-all duration-300
-                                        ${selectedAddress === addr.id
-                                            ? 'border-blue-600 shadow-md bg-blue-50/20 ring-1 ring-blue-600 ring-opacity-10'
-                                            : 'border-gray-200 hover:border-gray-300 hover:shadow-sm'
-                                        }
-                                    `}
-                                >
-                                    {/* Header: Type Badge & Actions */}
-                                    <div className="flex justify-between items-start mb-3">
-                                        <div className={`
-                                            inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold uppercase tracking-wide
-                                            ${addr.type === 'Home' ? 'bg-indigo-100 text-indigo-700' : 'bg-orange-100 text-orange-700'}
-                                        `}>
-                                            {addr.type === 'Home' ? <Home className="w-3 h-3" /> : <Briefcase className="w-3 h-3" />}
-                                            {addr.type}
-                                        </div>
-
-                                        {/* Edit/Delete Options (Visual Only) */}
-                                        <button className="text-gray-400 hover:text-gray-600 p-1 rounded-full hover:bg-gray-100">
-                                            <MoreVertical className="w-4 h-4" />
-                                        </button>
-                                    </div>
-
-                                    {/* Name & Phone */}
-                                    <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-6 mb-3">
-                                        <h3 className="text-lg font-bold text-gray-900">{addr.name}</h3>
-                                        <div className="flex items-center text-gray-500 text-sm">
-                                            <Phone className="w-3.5 h-3.5 mr-1.5" />
-                                            {addr.phone}
-                                        </div>
-                                    </div>
-
-                                    {/* Address Details */}
-                                    <div className="text-gray-600 text-sm leading-relaxed mb-4 pr-8">
-                                        <p>{addr.addressLine1}, {addr.addressLine2}</p>
-                                        <p className="font-medium text-gray-900 mt-1">{addr.city}, {addr.state} - {addr.pincode}</p>
-                                    </div>
-
-                                    {/* Selection Indicator */}
-                                    <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-100">
-                                        {selectedAddress === addr.id ? (
-                                            <span className="flex items-center gap-2 text-blue-600 font-semibold text-sm">
-                                                <CheckCircle2 className="w-5 h-5 fill-blue-100" />
-                                                Deliver Here
-                                            </span>
-                                        ) : (
-                                            <span className="text-gray-400 text-sm font-medium pl-1">Tap to select</span>
-                                        )}
-
-                                        {/* Edit Button */}
-                                        <button className="text-sm font-semibold text-blue-600 hover:text-blue-800 hover:underline">
-                                            Edit
-                                        </button>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
+                    <div className="flex justify-between text-sm mb-1 text-gray-600">
+                        <span>Quentity {cartItems.length} </span>
+                        <span>₹{Math.floor(subtotal)}</span>
                     </div>
-
-                    {/* RIGHT COLUMN: Order Summary */}
-                    <div className="lg:col-span-4 order-1 lg:order-2">
-                        <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 lg:sticky lg:top-8">
-                            <h2 className="text-lg font-bold text-gray-900 mb-4">Delivery Details</h2>
-
-                            {/* Mini Cart Preview */}
-                            <div className="flex items-center gap-4 mb-6 pb-6 border-b border-gray-100">
-                                <div className="flex -space-x-3 overflow-hidden">
-                                    <div className="w-10 h-10 rounded-full bg-gray-200 border-2 border-white" title="Product 1"></div>
-                                    <div className="w-10 h-10 rounded-full bg-gray-300 border-2 border-white" title="Product 2"></div>
-                                    <div className="w-10 h-10 rounded-full bg-gray-100 border-2 border-white flex items-center justify-center text-xs font-bold text-gray-500">+2</div>
-                                </div>
-                                <div className="text-sm text-gray-500">
-                                    <span className="font-bold text-gray-900 block">4 Items</span> in your cart
-                                </div>
-                            </div>
-
-                            <div className="space-y-3 text-sm mb-6">
-                                <div className="flex justify-between text-gray-600">
-                                    <span>Bag Total</span>
-                                    <span>₹1,250.00</span>
-                                </div>
-                                <div className="flex justify-between text-gray-600">
-                                    <span>Delivery Charges</span>
-                                    <span className="text-green-600">FREE</span>
-                                </div>
-                                <div className="flex justify-between font-bold text-lg text-gray-900 pt-3 border-t border-dashed border-gray-200">
-                                    <span>Total Amount</span>
-                                    <span>₹1,250.00</span>
-                                </div>
-                            </div>
-
-                            <button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 px-4 rounded-xl transition-all shadow-lg shadow-blue-200 hover:shadow-blue-300 flex items-center justify-center gap-2">
-                                <span>Continue to Payment</span>
-                                <ArrowRight className="w-4 h-4" />
-                            </button>
-
-                            <p className="text-xs text-gray-400 text-center mt-4 leading-normal">
-                                By continuing, you agree to our Terms of Service and Privacy Policy.
-                            </p>
-                        </div>
+                    <div className="flex justify-between text-sm mb-1 text-gray-600">
+                        <span>Delivery:</span>
+                        <span className="text-green-600">{deliveryFee === 0 ? 'FREE' : `₹${deliveryFee}`}</span>
                     </div>
-
+                    {totalSavings > 0 && (
+                        <div className="flex justify-between text-sm text-green-600">
+                            <span>Total Discount</span>
+                            <span>- ₹{Math.floor(totalSavings)}</span>
+                        </div>
+                    )}
+                    <div className="flex justify-between text-lg font-bold text-gray-900 mt-2 border-t pt-2 border-dashed">
+                        <span>Order Total:</span>
+                        <span>₹{Math.floor(finalTotal)}</span>
+                    </div>
                 </div>
             </div>
+
+            {/* Mobile Total Strip (Always visible if closed) */}
+            {isMobile && !showMobileSummary && (
+                <div className="px-4 py-2 flex justify-between items-center bg-white">
+                    <span className="text-gray-600 text-sm">Total:</span>
+                    <span className="font-bold text-lg">₹{Math.floor(finalTotal)}</span>
+                </div>
+            )}
+        </div>
+    );
+
+    return (
+        <div className="min-h-screen bg-[#EAEDED] font-sans pb-32 lg:pb-8">
+
+            {/* Header */}
+            <div className="bg-[#232f3e] text-white py-3 px-4 shadow-md sticky top-0 z-20">
+                <div className="max-w-6xl mx-auto flex items-center justify-between">
+                    <h1 className="text-lg lg:text-xl font-bold">Review Address</h1>
+                    <div className="hidden md:flex items-center gap-2 text-sm text-gray-300">
+                        <span className="text-green-400 font-bold">Cart</span>
+                        <ChevronRight size={14} />
+                        <span className="text-white font-bold border-b-2 border-orange-400 pb-0.5">Address</span>
+                        <ChevronRight size={14} />
+                        <span>Payment</span>
+                    </div>
+                </div>
+            </div>
+
+            <div className="max-w-6xl mx-auto p-4 lg:grid lg:grid-cols-12 lg:gap-6 mt-2">
+
+                {/* ---------------- LEFT COLUMN ---------------- */}
+                <div className="lg:col-span-8 space-y-4">
+
+                    {/* 📱 MOBILE ORDER SUMMARY (Visible Here) */}
+                    <div className="block lg:hidden">
+                        <OrderSummaryCard isMobile={true} />
+                    </div>
+
+                    <h2 className="text-lg lg:text-xl font-bold text-orange-700 mb-2">Select a delivery address</h2>
+
+                    {/* ADDRESS LIST */}
+                    <div className="space-y-4">
+                        {addresses.map((addr) => {
+                            const isSelected = selectedAddressId === addr._id;
+                            return (
+                                <div
+                                    key={addr.id}
+                                    onClick={() => setSelectedAddressId(addr._id)}
+                                    className={`relative bg-white p-4 rounded-lg cursor-pointer border-2 transition-all
+                                        ${isSelected ? 'border-orange-200 bg-orange-50/30' : 'border-gray-200 hover:border-gray-300'}
+                                    `}
+                                >
+                                    <div className="flex gap-3 items-start">
+                                        <div className="pt-1">
+                                            <div className={`w-5 h-5 rounded-full border flex items-center justify-center ${isSelected ? 'border-orange-500 bg-white' : 'border-gray-400 bg-white'}`}>
+                                                {isSelected && <div className="w-2.5 h-2.5 rounded-full bg-orange-500"></div>}
+                                            </div>
+                                        </div>
+                                        <div className="flex-1">
+                                            <div className="flex items-center gap-2 mb-1">
+                                                <span className="font-bold text-gray-900">{addr.name}</span>
+                                                <span className="px-2 py-0.5 bg-gray-100 text-xs font-bold text-gray-600 uppercase border rounded">{addr.type}</span>
+                                            </div>
+                                            <div className="text-sm text-gray-700 leading-relaxed">
+                                                <p>{addr.flat}, {addr.area}</p>
+                                                <p className="font-medium uppercase mt-1">{addr.city}, {addr.state} - {addr.pincode}</p>
+                                                <p className="mt-1">India</p>
+                                                <p className="mt-2 text-gray-900 font-medium">Phone: {addr.mobile}</p>
+                                            </div>
+                                            {isSelected && (
+                                                <div className="hidden lg:block mt-4">
+                                                    <button
+                                                        onClick={(e) => { e.stopPropagation(); handleProceed(); }}
+                                                        className="bg-yellow-400 hover:bg-yellow-500 text-gray-900 text-sm font-medium py-2 px-6 rounded-md shadow-sm border border-yellow-500"
+                                                    >
+                                                        Use this address
+                                                    </button>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            );
+                        })}
+
+                        {/* ADD ADDRESS BUTTON */}
+                        <div onClick={() => setIsModalOpen(true)} className="flex items-center gap-3 p-4 bg-white rounded-lg border border-gray-300 hover:bg-gray-50 cursor-pointer">
+                            <Plus className="text-gray-400" />
+                            <span className="text-gray-600 font-bold">Add a new address</span>
+                        </div>
+                    </div>
+                </div>
+
+                {/* ---------------- RIGHT COLUMN (DESKTOP SUMMARY) ---------------- */}
+                <div className="hidden lg:block lg:col-span-4">
+                    <OrderSummaryCard isMobile={false} />
+                </div>
+
+            </div>
+
+            {/* 📱 MOBILE STICKY FOOTER */}
+            <div className="fixed bottom-0 left-0 right-0 bg-white border-t p-3 lg:hidden z-30 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]">
+                <button
+                    onClick={handleProceed}
+                    className="w-full bg-yellow-400 hover:bg-yellow-500 active:bg-yellow-600 text-gray-900 font-medium py-3 rounded-lg shadow-sm border border-yellow-500"
+                >
+                    Deliver to this address
+                </button>
+            </div>
+
+            <AddAddressModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onSave={handleAddNewAddress} />
         </div>
     );
 };

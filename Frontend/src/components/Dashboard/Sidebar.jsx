@@ -1,34 +1,41 @@
 import React, { useState } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
+import api from "../../api/axios";
 import {
-  LayoutDashboard,
-  Package,
-  ClipboardList,
-  Users,
-  Menu,
-  X,
-  Plus,
-  PlusCircle,
-  Pencil,
-  ShoppingBasket,
-  ArrowLeftIcon
+    LayoutDashboard,
+    Package,
+    ClipboardList,
+    Users,
+    Menu,
+    X,
+    Plus,
+    PlusCircle,
+    Pencil,
+    ShoppingBasket,
+    ArrowLeftIcon
 } from "lucide-react";
 
 const Sidebar = () => {
+    const navigate = useNavigate();
     const [isOpen, setIsOpen] = useState(false);
 
     const toggleSidebar = () => setIsOpen(!isOpen);
     const closeSidebar = () => setIsOpen(false);
 
     const navItems = [
-        { name: "Dashboard", path: "/dashboard", icon: <LayoutDashboard size={20} /> },
-        { name: "Products", path: "/dashboard/products", icon: <Package size={20} /> },
-        { name: "Orders", path: "/dashboard/order", icon: <ShoppingBasket size={20} /> },
-        { name: "Add Product", path: "/dashboard/add", icon: <PlusCircle size={20} /> },
-        { name: "Edit Product", path: "/dashboard/edit", icon: <Pencil size={20} /> },
-        { name: "Customers", path: "/dashboard/customers", icon: <Users size={20} /> },
-        { name: "Showcase", path: "/dashboard/showcase", icon: <ClipboardList size={20} /> },
+        { name: "Dashboard", path: "/trendclips/secure-panel-x308/dashboard", icon: <LayoutDashboard size={20} /> },
+        { name: "Products", path: "/trendclips/secure-panel-x308/dashboard/products", icon: <Package size={20} /> },
+        { name: "Orders", path: "/trendclips/secure-panel-x308/dashboard/order", icon: <ShoppingBasket size={20} /> },
+        { name: "Add Product", path: "/trendclips/secure-panel-x308/dashboard/add", icon: <PlusCircle size={20} /> },
+        { name: "Edit Product", path: "/trendclips/secure-panel-x308/dashboard/edit", icon: <Pencil size={20} /> },
+        // { name: "Customers", path: "/trendclips/secure-panel-x308/dashboard/customers", icon: <Users size={20} /> },
+        { name: "Showcase", path: "/trendclips/secure-panel-x308/dashboard/showcase", icon: <ClipboardList size={20} /> },
     ];
+
+    const handleLogout = async () => {
+        await api.post("/api/admin/logout");
+        navigate("/adminlogin");
+    };
 
     return (
         <>
@@ -101,7 +108,7 @@ const Sidebar = () => {
                         <Plus size={18} />
                         Add Product
                     </button>
-                    <button className="w-full bg-red-500 hover:bg-red-400 text-white font-semibold py-3 rounded-lg flex items-center justify-center gap-2 shadow-lg">
+                    <button onClick={handleLogout} className="w-full bg-red-500 hover:bg-red-400 text-white font-semibold py-3 rounded-lg flex items-center justify-center gap-2 shadow-lg">
                         <ArrowLeftIcon size={18} />
                         Logout
                     </button>

@@ -321,12 +321,39 @@ const ProductPage = () => {
                                             price: product.finalPrice,
                                             image: product.images?.[0]?.url,
                                             quantity: quantity,
+                                            mrp: product.price,
+                                            discount: product.discount,
+                                            stock: product.quantity,
+                                            status: product.status
+
                                         });
                                     }}
                                     className="w-full bg-[#FFD814] hover:bg-[#F7CA00] border border-[#FCD200] text-black py-2.5 rounded-full text-sm shadow-sm transition-colors cursor-pointer">
                                     Add to Cart
                                 </button>
-                                <button className="w-full bg-[#FA8900] hover:bg-[#E37B00] border border-[#E37B00] text-white py-2.5 rounded-full text-sm shadow-sm transition-colors cursor-pointer">
+                                <button
+                                    onClick={() => {
+                                        navigate("/address", {
+                                            state: {
+                                                buyNow: true, // 🔥 IMPORTANT FLAG
+                                                cartItems: [
+                                                    {
+                                                        id: product._id,
+                                                        name: product.title,
+                                                        price: product.finalPrice,
+                                                        image: product.images?.[0]?.url,
+                                                        quantity:quantity,
+                                                        mrp: product.price,
+                                                        discount: product.discount,
+                                                        stock: product.quantity,
+                                                        status: product.status,
+                                                    }
+                                                ],
+                                            }
+                                        });
+                                    }}
+                                    className="w-full bg-[#FA8900] hover:bg-[#E37B00] border border-[#E37B00] text-white py-2.5 rounded-full text-sm shadow-sm transition-colors cursor-pointer"
+                                >
                                     Buy Now
                                 </button>
                             </div>
@@ -344,12 +371,49 @@ const ProductPage = () => {
             {/* Mobile Sticky Buy Button */}
             <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-3 flex items-center gap-3 z-50 pb-safe">
                 <div className="flex-1">
-                    <button className="w-full bg-[#FFD814] text-black font-medium py-3 rounded-full text-sm shadow-sm">
+                    <button
+                        onClick={() => {
+                            flyToCart(product.imgRef);
+                            addToCart({
+                                id: product._id,
+                                name: product.title,
+                                price: product.finalPrice,
+                                image: product.images?.[0]?.url,
+                                quantity: quantity,
+                                mrp: product.price,
+                                discount: product.discount,
+                                stock: product.quantity,
+                                status: product.status
+                            });
+                        }}
+                        className="w-full bg-[#FFD814] text-black font-medium py-3 rounded-full text-sm shadow-sm">
                         Add to Cart
                     </button>
                 </div>
                 <div className="flex-1">
-                    <button className="w-full bg-[#FA8900] text-white font-medium py-3 rounded-full text-sm shadow-sm">
+                    <button
+                        onClick={() => {
+                            navigate("/address", {
+                                state: {
+                                    buyNow: true, // 🔥 IMPORTANT FLAG
+                                    cartItems: [
+                                        {
+                                            id: product._id,
+                                            name: product.title,
+                                            price: product.finalPrice || product.price,
+                                            image: product.images?.[0]?.url,
+                                            quantity: quantity,
+                                            mrp: product.price,
+                                            discount: product.discount,
+                                            stock: product.quantity,
+                                            status: product.status,
+                                        }
+                                    ],
+                                }
+                            });
+                        }}
+                        className="w-full bg-[#FA8900] hover:bg-[#E37B00] border border-[#E37B00] text-white py-2.5 rounded-full text-sm shadow-sm transition-colors cursor-pointer"
+                    >
                         Buy Now
                     </button>
                 </div>

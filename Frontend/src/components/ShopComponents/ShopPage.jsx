@@ -8,7 +8,6 @@ import {
   Search,
   Filter,
   Star,
-  X,
   ShoppingCart,
   Heart,
   Shield,
@@ -292,13 +291,15 @@ const ShopPage = () => {
 
                 return (
                   <div
-                    onClick={() => navigate(`/info/products/${product._id}`)}
+
                     key={product._id}
                     className={`group bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex ${viewMode === 'list' ? 'flex-row' : 'flex-col'} 
                     ${isBestSeller ? 'border-l-[6px] border-l-yellow-400' : ''}`}
                   >
                     {/* Image Area */}
-                    <div className={`relative ${viewMode === 'list' ? 'w-36 md:w-56 shrink-0' : 'aspect-4/5'} bg-gray-50 overflow-hidden`}>
+                    <div
+                      onClick={() => navigate(`/info/products/${product._id}`)}
+                      className={`relative ${viewMode === 'list' ? 'w-36 md:w-56 shrink-0' : 'aspect-4/5'} bg-gray-50 overflow-hidden`}>
 
                       {/* 2. FIXED: ImageWithLoader now accepts ref */}
                       <ImageWithLoader
@@ -364,6 +365,10 @@ const ShopPage = () => {
                             price: product.finalPrice,
                             image: product.images?.[0]?.url,
                             quantity: 1, // ✅ MUST
+                            mrp: product.price,
+                            discount: product.discount,
+                            stock: product.quantity,
+                            status: product.status
                           });
                         }}
                         className="mt-4 w-full py-2.5 bg-amber-400 hover:bg-amber-500 text-slate-900 text-xs md:text-sm font-bold rounded-xl transition-all active:scale-95 shadow-sm shadow-amber-200 flex items-center justify-center gap-2"

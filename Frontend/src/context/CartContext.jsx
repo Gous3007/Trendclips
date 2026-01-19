@@ -1,17 +1,26 @@
 import { createContext, useContext, useState, useEffect } from "react";
+import { getGuestId } from "../utils/guest"; // ✅ ADD
 
 const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
+
+    const guestId = getGuestId(); // ✅ ADD
+
+    const clearCart = () => {
+        setCartItems([]);
+        localStorage.removeItem(`cart_${guestId}`);
+    };
+
     const [cartItems, setCartItems] = useState(() => {
-        const saved = localStorage.getItem("cart");
+        const saved = localStorage.getItem(`cart_${guestId}`);
         return saved ? JSON.parse(saved) : [];
     });
 
     // localStorage sync
     useEffect(() => {
-        localStorage.setItem("cart", JSON.stringify(cartItems));
-    }, [cartItems]);
+        localStorage.setItem(`cart_${guestId}`, JSON.stringify(cartItems));
+    }, [cartItems, guestId]);
 
     // ADD TO CART
     const addToCart = (product) => {
@@ -23,29 +32,26 @@ export const CartProvider = ({ children }) => {
                     item.id === product.id
                         ? {
                             ...item,
-                            quantity: item.quantity + product.quantity // ✅ FIX
+                            quantity: item.quantity + product.quantity
                         }
                         : item
                 );
             }
 
-            // ✅ NEW ITEM: use passed quantity
             return [
                 ...prev,
                 {
                     ...product,
-                    quantity: product.quantity // ✅ FIX
+                    quantity: product.quantity
                 }
             ];
         });
     };
 
-    // REMOVE
     const removeFromCart = (id) => {
         setCartItems(prev => prev.filter(item => item.id !== id));
     };
 
-    // UPDATE QTY
     const updateQuantity = (id, type) => {
         setCartItems(prev =>
             prev.map(item =>
@@ -66,7 +72,9 @@ export const CartProvider = ({ children }) => {
             cartItems,
             addToCart,
             removeFromCart,
-            updateQuantity
+            updateQuantity,
+            guestId, // ✅ expose guestId
+            clearCart, // ✅ ADD
         }}>
             {children}
         </CartContext.Provider>

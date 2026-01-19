@@ -1,7 +1,6 @@
 import React from "react";
 import Products from "../components/ProductDetails/ProductPage";
 import RelatedProducts from "../components/ProductDetails/RelatedProducts";
-import ProductSkeleton from "../components/Loaders/ProductSkeleton";
 const allProducts = () => {
     return (
         <div>

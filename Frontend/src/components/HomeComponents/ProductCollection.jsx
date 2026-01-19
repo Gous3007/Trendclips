@@ -344,6 +344,10 @@ const ProductCollection = () => {
                                                         price: item.finalPrice,
                                                         image: item.images?.[0]?.url,
                                                         quantity: 1, // ✅ MUST
+                                                        mrp: item.price,
+                                                        discount: item.discount,
+                                                        stock: item.quantity,
+                                                        status: item.status
                                                     });
                                                 }}
                                                 className="bg-orange-600 text-white p-2.5 rounded-xl hover:bg-orange-700 transition-all duration-300 active:scale-90"

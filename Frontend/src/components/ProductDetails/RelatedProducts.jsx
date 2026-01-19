@@ -38,7 +38,6 @@ const RelatedProducts = ({ currentCategory, currentProductId }) => {
                 {/* Products Grid */}
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-5">
                     {sortedProducts.slice(0, 8).map(product => (
-                        console.log("Rendering product:", product) ||
                         <div
                             key={product._id}
                             onClick={() => navigate(`/info/products/${product._id}`)}

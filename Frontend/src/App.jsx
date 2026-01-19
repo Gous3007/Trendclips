@@ -20,36 +20,68 @@ import AddProduct from "./pages/dashboard/AddProduct.jsx";
 import EditProductPage from "./pages/dashboard/EditProductPage.jsx";
 import ShowcaseManager from "./pages/dashboard/ShowcaseManager.jsx";
 import { initLenis, destroyLenis } from "./utils/lenis";
+import PageLoaderWrapper from "./components/Loaders/PageLoaderWrapper.jsx";
+import AdminLogin from "./pages/AdminLogin.jsx";
+import AdminRoute from "./routes/AdminRoute";
+import NotFound from "./pages/NotFound";
+import PaymentSuccess from "./pages/PaymentSucess.jsx";
+import MyOrder from "./pages/MyOrders.jsx"
 
 const AnimatedRoutes = () => {
   const location = useLocation();
 
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: "smooth",
+    });
+
+    // Lenis use ho raha ho to
+    if (window.lenis) {
+      window.lenis.scrollTo(0, { immediate: false });
+    }
+  }, [location.pathname]);
+
   return (
     <AnimatePresence mode="wait">
       <CartProvider>
-        <Routes location={location} key={location.pathname}>
-          <Route element={<MainLayout />}>
-            <Route path="/" element={<Home />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/shop" element={<Shop />} />
-            <Route path="/shop/:category" element={<Shop />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/info/products/:id" element={<Products />} />
-            <Route path="/cart" element={<AddToCart />} />
-            <Route path="/checkout" element={<Checkout />} />
-            <Route path="/payment" element={<PaymentPage />} />
-            <Route path="/address" element={<AddressPage />} />
-          </Route>
-          {/* Dashboard Routes */}
-          <Route path="/dashboard" element={<DashboardLayout />}>
-            <Route index element={<DashboardHome />} />
-            <Route path="products" element={<DashboardProduct />} />
-            <Route path="order" element={<Order />} />
-            <Route path="add" element={<AddProduct />} />
-            <Route path="edit" element={<EditProductPage />} />
-            <Route path="showcase" element={<ShowcaseManager />} />
-          </Route>
-        </Routes>
+        <PageLoaderWrapper>
+          <Routes location={location} key={location.pathname}>
+            <Route element={<MainLayout />}>
+              <Route path="/" element={<Home />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/shop" element={<Shop />} />
+              <Route path="/shop/:category" element={<Shop />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/info/products/:id" element={<Products />} />
+              <Route path="/cart" element={<AddToCart />} />
+              <Route path="/checkout" element={<Checkout />} />
+              <Route path="/payment" element={<PaymentPage />} />
+              <Route path="/address" element={<AddressPage />} />
+              <Route path="/payment/success" element={<PaymentSuccess />} />
+              <Route path="/my-orders" element={<MyOrder />} />
+            </Route>
+            <Route path="/adminlogin" element={<AdminLogin />} />
+            {/* Dashboard Routes */}
+            <Route
+              path="/trendclips/secure-panel-x308/dashboard"
+              element={
+                <AdminRoute>
+                  <DashboardLayout />
+                </AdminRoute>
+              }
+            >
+              <Route index element={<DashboardHome />} />
+              <Route path="products" element={<DashboardProduct />} />
+              <Route path="order" element={<Order />} />
+              <Route path="add" element={<AddProduct />} />
+              <Route path="edit" element={<EditProductPage />} />
+              <Route path="showcase" element={<ShowcaseManager />} />
+            </Route>
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </PageLoaderWrapper>
       </CartProvider>
     </AnimatePresence>
   );

@@ -2,13 +2,14 @@ import React, { useState, useEffect } from "react";
 import { NavLink, Link } from "react-router-dom";
 import { useCart } from "../context/CartContext.jsx";
 import { useNavigate } from "react-router-dom";
+import api from "../api/axios.js";
+import { getGuestId } from "../utils/guest.js";
 import {
   Search,
   MapPin,
   ShoppingCart,
   Menu,
   X,
-  ChevronDown,
   User,
   Heart,
 } from "lucide-react";
@@ -18,7 +19,8 @@ const Navbar = () => {
   const [searchText, setSearchText] = useState("");
   const [mobileSearch, setMobileSearch] = useState("");
   const navigate = useNavigate();
-
+  const [hasOrders, setHasOrders] = useState(false);
+  const guestId = getGuestId();
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -69,6 +71,17 @@ const Navbar = () => {
     "Home & Kitchen",
     "Stationery",
   ];
+
+
+  useEffect(() => {
+    if (guestId) {
+      api
+        .get(`/api/order/guest-has-orders/${guestId}`)
+        .then(res => {
+          setHasOrders(res.data.hasOrders);
+        });
+    }
+  }, [guestId]);
 
   return (
     <header
@@ -168,14 +181,18 @@ const Navbar = () => {
           {/* Right Side Actions */}
           <div className="flex items-center gap-2 md:gap-4">
             {/* Account - Desktop */}
-            <div className="hidden md:block relative group">
-              <Link
-                to="/account"
-                className="flex flex-col items-center px-3 py-2 hover:text-orange-500"
-              >
-                <User size={22} />
-                <span className="text-xs mt-1">Account</span>
-              </Link>
+            <div className="hidden md:block relative">
+              {guestId && hasOrders && (
+                <Link
+                  to="/my-orders"
+                  className="flex flex-col items-center px-3 py-2 hover:text-orange-500"
+                >
+                  <div className="w-9 h-9 rounded-full bg-orange-500 text-white flex items-center justify-center font-semibold">
+                    {guestId.slice(6, 8).toUpperCase()}
+                  </div>
+                  <span className="text-xs mt-1">My Orders</span>
+                </Link>
+              )}
             </div>
 
             {/* Cart */}
