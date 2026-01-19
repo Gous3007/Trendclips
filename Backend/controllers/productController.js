@@ -108,14 +108,27 @@ exports.createProduct = async (req, res) => {
 
 exports.getAllProducts = async (req, res) => {
     try {
-        const products = await Product.find().sort({ createdAt: -1 });
+        const { category } = req.query;
+
+        // 🧠 filter object
+        let filter = {};
+
+        // ✅ agar category aayi hai to filter lagao
+        if (category) {
+            filter.category = category;
+        }
+
+        const products = await Product
+            .find(filter)
+            .sort({ createdAt: -1 });
 
         res.status(200).json({
             success: true,
             products
         });
+
     } catch (error) {
-        console.error(error);
+        console.error("Get Products Error ❌", error);
         res.status(500).json({ message: "Server error" });
     }
 };

@@ -3,6 +3,7 @@ const router = express.Router();
 const upload = require("../middleware/multer");
 const { createProduct, getAllProducts, deleteProduct, getSingleProduct } = require("../controllers/productController");
 const Product = require("../model/Product");
+
 router.post(
     "/create",
     upload.array("images", 10), // max 10 images
