@@ -10,6 +10,7 @@ const ShowcaseRoute = require("./routes/showcaseRoutes.js");
 const addressRoutes = require("./routes/addressRoutes.js");
 const adminRoutes = require("./routes/adminRoutes.js");
 const paymentRoutes = require("./routes/paymentRoutes");
+const adminSetupRoute = require("./routes/adminSetup.js");
 
 const app = express();
 app.use(cookieParser());
@@ -37,6 +38,7 @@ app.use("/api/showcase", ShowcaseRoute);
 app.use("/api", addressRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/payment", paymentRoutes);
+app.use("/api/setup", adminSetupRoute);
 // --------------------
 // React Build Serve
 // --------------------
