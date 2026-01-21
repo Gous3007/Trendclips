@@ -6,7 +6,7 @@ import { flyToCart } from "../../utils/flyToCart.js";
 import { useNavigate } from "react-router-dom";
 import api from "../../api/axios.js";
 import {
-    Star, Truck, MapPin, ShieldCheck, RotateCcw,
+    Star, Zap, PackageCheck, ShieldCheck, RotateCcw,
     ChevronRight, Minus, Plus, Heart, Share2,
     ChevronDown, ChevronUp, Lock
 } from "lucide-react";
@@ -215,10 +215,10 @@ const ProductPage = () => {
                         {/* Feature Icons */}
                         <div className="flex gap-4 py-4 overflow-x-auto no-scrollbar">
                             {[
-                                { icon: <RotateCcw size={20} />, text: "7 days Returnable" },
-                                { icon: <Truck size={20} />, text: "Free Delivery" },
-                                { icon: <ShieldCheck size={20} />, text: "1 Year Warranty" },
-                                { icon: <MapPin size={20} />, text: "Pay on Delivery" },
+                                { icon: <Zap size={20} />, text: "Lightning-Fast Delivery" },
+                                { icon: <Lock size={20} />, text: "Secure Checkout Guaranteed" },
+                                { icon: <Star size={20} />, text: "Top-Rated Product Quality" },
+                                { icon: <PackageCheck size={20} />, text: "Quality Checked Before Shipping" }
                             ].map((item, i) => (
                                 <div key={i} className="min-w-20 flex flex-col items-center text-center gap-2">
                                     <div className="w-10 h-10 rounded-full bg-white border border-gray-200 flex items-center justify-center text-[#007185]">
@@ -342,7 +342,7 @@ const ProductPage = () => {
                                                         name: product.title,
                                                         price: product.finalPrice,
                                                         image: product.images?.[0]?.url,
-                                                        quantity:quantity,
+                                                        quantity: quantity,
                                                         mrp: product.price,
                                                         discount: product.discount,
                                                         stock: product.quantity,

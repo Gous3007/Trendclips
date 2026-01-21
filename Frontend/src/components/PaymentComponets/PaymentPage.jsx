@@ -24,8 +24,6 @@ const PaymentPage = () => {
         shippingAddress = {}
     } = location.state || {};
 
-    console.log("cart items at payment page:", cartItems);
-
     // 🧮 CALCULATIONS
     const subtotals = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
     const totalMRP = cartItems.reduce((acc, item) => acc + item.mrp * item.quantity, 0);
@@ -299,7 +297,7 @@ const PaymentPage = () => {
                 <div className="flex items-center justify-between gap-4 max-w-6xl mx-auto">
                     <div>
                         <p className="text-xs text-gray-500">Total Payable</p>
-                        <p className="text-xl font-bold text-gray-900">₹{finalTotal}</p>
+                        <p className="text-xl font-bold text-gray-900">₹{Math.floor(finalTotal)}</p>
                     </div>
                     <button
                         onClick={handlePayment}

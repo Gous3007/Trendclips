@@ -1,151 +1,218 @@
-import React from 'react';
-import { Mail, Phone, MapPin } from 'lucide-react';
+import React, { useState } from "react";
+import { Mail, Phone, MapPin, Send, Loader2 } from "lucide-react";
+import { Toaster, toast } from "react-hot-toast"; // 👈 Notification ke liye
+import api from "../../api/axios";
 
 const ContactUs = () => {
+    const [formData, setFormData] = useState({
+        fullName: "",
+        email: "",
+        phone: "",
+        message: "",
+    });
+
+    const [loading, setLoading] = useState(false);
+
+    // 🔁 Input Change Handler
+    const handleChange = (e) => {
+        setFormData({
+            ...formData,
+            [e.target.id]: e.target.value,
+        });
+    };
+
+    // 🚀 Submit Handler
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+
+        // Basic Validation
+        if (!formData.fullName || !formData.email || !formData.message) {
+            toast.error("Please fill in all required fields.");
+            setLoading(false);
+            return;
+        }
+
+        try {
+            await api.post("/api/contact", formData);
+
+            // 🎉 Success Notification
+            toast.success("Message sent successfully! We'll contact you soon.");
+
+            // Form Reset
+            setFormData({
+                fullName: "",
+                email: "",
+                phone: "",
+                message: "",
+            });
+        } catch (err) {
+            // ❌ Error Notification
+            toast.error(err.response?.data?.message || "Something went wrong. Please try again.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
-        <div className="bg-white min-h-screen py-12 px-4 sm:px-6 lg:px-8 font-sans">
-            {/* Header Section */}
-            <div className="text-center mb-12">
-                <h2 className="text-blue-500 font-semibold tracking-wide uppercase text-sm">Contact Us</h2>
-                <h1 className="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl">
+        <div className="min-h-screen bg-gray-50 font-sans">
+            {/* 🔔 Toaster Component (Notifications yaha dikhenge) */}
+            <Toaster position="top-center" reverseOrder={false} />
+
+            {/* HEADER SECTION with Gradient */}
+            <div className="bg-linear-to-r from-gray-800 to-indigo-600 py-16 px-4 sm:px-6 lg:px-8 text-center text-white">
+                <h2 className="text-blue-200 font-bold tracking-wide uppercase text-sm">
+                    Get in Touch
+                </h2>
+                <h1 className="mt-2 text-3xl md:text-5xl font-extrabold tracking-tight">
                     We're here to help
                 </h1>
-                <p className="mt-4 max-w-2xl text-lg text-gray-500 mx-auto">
-                    We're always happy to hear from you. Fill out the form below or use one of the other contact methods to get in touch.
+                <p className="mt-4 max-w-2xl text-lg text-blue-100 mx-auto">
+                    Have questions about our services? Need support? Fill out the form below or visit us.
                 </p>
             </div>
 
-            <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* MAIN CONTENT CONTAINER */}
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-10 pb-16">
+                <div className="bg-white rounded-2xl shadow-xl overflow-hidden grid grid-cols-1 lg:grid-cols-5">
 
-                {/* Left Column: Contact Form */}
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sm:p-8 lg:col-span-2">
-                    <form className="space-y-6">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-                                <input
-                                    type="text"
-                                    id="fullName"
-                                    placeholder="Enter your full name"
-                                    className="block w-full border-gray-200 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm p-3 border bg-gray-50"
-                                />
-                            </div>
-                            <div>
-                                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
-                                <input
-                                    type="email"
-                                    id="email"
-                                    placeholder="Enter your email address"
-                                    className="block w-full border-gray-200 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm p-3 border bg-gray-50"
-                                />
-                            </div>
-                        </div>
+                    {/* 📍 LEFT SIDE: Contact Info & Map (Takes 2 cols on LG) */}
+                    <div className="lg:col-span-2 bg-slate-900 text-white p-8 sm:p-10 flex flex-col justify-between relative overflow-hidden">
+                        {/* Decorative Circles */}
+                        <div className="absolute top-0 right-0 -mr-10 -mt-10 w-40 h-40 rounded-full bg-blue-500 opacity-20 blur-xl"></div>
+                        <div className="absolute bottom-0 left-0 -ml-10 -mb-10 w-40 h-40 rounded-full bg-purple-500 opacity-20 blur-xl"></div>
 
-                        <div>
-                            <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">Phone (Optional)</label>
-                            <input
-                                type="tel"
-                                id="phone"
-                                placeholder="Enter your phone number"
-                                className="block w-full border-gray-200 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm p-3 border bg-gray-50"
-                            />
-                        </div>
+                        <div className="relative z-10 space-y-8">
+                            <h3 className="text-2xl font-bold">Contact Information</h3>
+                            <p className="text-slate-300 text-sm leading-relaxed">
+                                Fill up the form and our Team will get back to you within 24 hours.
+                            </p>
 
-                        <div>
-                            <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-1">Your Message</label>
-                            <textarea
-                                id="message"
-                                rows="5"
-                                placeholder="How can we help you today?"
-                                className="block w-full border-gray-200 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm p-3 border bg-gray-50 resize-none"
-                            ></textarea>
-                        </div>
-
-                        <div className="pt-2">
-                            <button
-                                type="submit"
-                                className="w-full sm:w-auto flex justify-center py-3 px-8 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
-                            >
-                                Send Message
-                            </button>
-                        </div>
-                        <p className="text-xs text-gray-400 mt-4">
-                            We'll get back to you within 24 hours. Your data is safe with us.
-                        </p>
-                    </form>
-                </div>
-
-                {/* Right Column: Contact Info & Map */}
-                <div className="space-y-6">
-
-                    {/* Contact Information Card */}
-                    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sm:p-8">
-                        <h3 className="text-lg font-bold text-gray-900 mb-6">Contact Information</h3>
-                        <div className="space-y-6">
-
-                            {/* Email Item */}
-                            <div className="flex items-start">
-                                <div className="shrink-0">
-                                    <div className="flex items-center justify-center h-10 w-10 rounded-full bg-pink-100 text-pink-500">
-                                        <Mail size={18} />
+                            <div className="space-y-6">
+                                <div className="flex items-center gap-4 group cursor-pointer">
+                                    <div className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center group-hover:bg-blue-500 transition-colors">
+                                        <Phone size={18} className="text-white" />
                                     </div>
+                                    <span className="text-slate-200 group-hover:text-white transition-colors">+91 123 456 7890</span>
                                 </div>
-                                <div className="ml-4">
-                                    <p className="text-sm font-medium text-gray-500">Email</p>
-                                    <p className="text-sm font-semibold text-gray-900 break-all">support@growfinix.in</p>
-                                </div>
-                            </div>
 
-                            {/* Phone Item */}
-                            <div className="flex items-start">
-                                <div className="shrink-0">
-                                    <div className="flex items-center justify-center h-10 w-10 rounded-full bg-blue-100 text-blue-500">
-                                        <Phone size={18} />
+                                <div className="flex items-center gap-4 group cursor-pointer">
+                                    <div className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center group-hover:bg-pink-500 transition-colors">
+                                        <Mail size={18} className="text-white" />
                                     </div>
+                                    <span className="text-slate-200 group-hover:text-white transition-colors">support@growfinix.in</span>
                                 </div>
-                                <div className="ml-4">
-                                    <p className="text-sm font-medium text-gray-500">Phone</p>
-                                    <p className="text-sm font-semibold text-gray-900">+91 123 456 7890</p>
-                                </div>
-                            </div>
 
-                            {/* Address Item */}
-                            <div className="flex items-start">
-                                <div className="shrink-0">
-                                    <div className="flex items-center justify-center h-10 w-10 rounded-full bg-purple-100 text-purple-500">
-                                        <MapPin size={18} />
+                                <div className="flex items-start gap-4 group cursor-pointer">
+                                    <div className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center group-hover:bg-purple-500 transition-colors shrink-0">
+                                        <MapPin size={18} className="text-white" />
                                     </div>
-                                </div>
-                                <div className="ml-4">
-                                    <p className="text-sm font-medium text-gray-500">Address</p>
-                                    <p className="text-sm font-semibold text-gray-900">
-                                        Ausa, District Latur,<br />
-                                        Maharashtra, India
-                                    </p>
+                                    <span className="text-slate-200 group-hover:text-white transition-colors">
+                                        Ausa Road, Latur, <br />Maharashtra, India - 413512
+                                    </span>
                                 </div>
                             </div>
-
                         </div>
-                    </div>
 
-                    {/* Location Map Card */}
-                    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sm:p-8">
-                        <h3 className="text-lg font-bold text-gray-900 mb-6">Our Location</h3>
-                        <div className="rounded-xl overflow-hidden bg-gray-200 h-64 border border-gray-100">
+                        {/* Embedded Map */}
+                        <div className="mt-10 relative z-10 rounded-xl overflow-hidden border border-white/20 h-48 md:h-60 shadow-lg">
                             <iframe
-                                src="https://maps.google.com/maps?q=Ausa,Latur&t=&z=13&ie=UTF8&iwloc=&output=embed"
-                                width="100%"
-                                height="100%"
-                                frameBorder="0"
-                                style={{ border: 0 }}
-                                allowFullScreen=""
-                                aria-hidden="false"
-                                tabIndex="0"
-                                title="Ausa Latur Map"
+                                title="Latur Map"
+                                src="https://maps.google.com/maps?q=Latur,Maharashtra&t=&z=13&ie=UTF8&iwloc=&output=embed"
+                                className="w-full h-full border-0 filter grayscale hover:grayscale-0 transition-all duration-500"
+                                allowFullScreen
+                                loading="lazy"
                             ></iframe>
                         </div>
                     </div>
 
+                    {/* 📝 RIGHT SIDE: Form (Takes 3 cols on LG) */}
+                    <div className="lg:col-span-3 p-8 sm:p-12 bg-white">
+                        <form onSubmit={handleSubmit} className="space-y-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                {/* Name */}
+                                <div className="space-y-2">
+                                    <label htmlFor="fullName" className="text-sm font-semibold text-gray-700">
+                                        Full Name
+                                    </label>
+                                    <input
+                                        type="text"
+                                        id="fullName"
+                                        value={formData.fullName}
+                                        onChange={handleChange}
+                                        placeholder="John Doe"
+                                        className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-200 transition-all outline-none"
+                                        required
+                                    />
+                                </div>
+
+                                {/* Phone */}
+                                <div className="space-y-2">
+                                    <label htmlFor="phone" className="text-sm font-semibold text-gray-700">
+                                        Phone Number
+                                    </label>
+                                    <input
+                                        type="tel"
+                                        id="phone"
+                                        value={formData.phone}
+                                        onChange={handleChange}
+                                        placeholder="+91 98765 43210"
+                                        className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-200 transition-all outline-none"
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Email */}
+                            <div className="space-y-2">
+                                <label htmlFor="email" className="text-sm font-semibold text-gray-700">
+                                    Email Address
+                                </label>
+                                <input
+                                    type="email"
+                                    id="email"
+                                    value={formData.email}
+                                    onChange={handleChange}
+                                    placeholder="john@example.com"
+                                    className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-200 transition-all outline-none"
+                                    required
+                                />
+                            </div>
+
+                            {/* Message */}
+                            <div className="space-y-2">
+                                <label htmlFor="message" className="text-sm font-semibold text-gray-700">
+                                    Your Message
+                                </label>
+                                <textarea
+                                    id="message"
+                                    rows="5"
+                                    value={formData.message}
+                                    onChange={handleChange}
+                                    placeholder="How can we help you?"
+                                    className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-200 transition-all outline-none resize-none"
+                                    required
+                                />
+                            </div>
+
+                            {/* Submit Button */}
+                            <button
+                                type="submit"
+                                disabled={loading}
+                                className="w-full md:w-auto px-8 py-3 rounded-lg bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+                            >
+                                {loading ? (
+                                    <>
+                                        <Loader2 size={18} className="animate-spin" />
+                                        Sending...
+                                    </>
+                                ) : (
+                                    <>
+                                        Send Message <Send size={18} />
+                                    </>
+                                )}
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>

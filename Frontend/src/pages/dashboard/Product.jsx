@@ -3,15 +3,15 @@ import api from "../../api/axios";
 import {
     Search,
     Filter,
-    Edit,
     Trash2,
-    ChevronLeft,
-    ChevronRight,
     Plus,
     Loader2,
-    AlertTriangle, // Delete warning icon
+    AlertTriangle,
     X,
-    CheckCircle // Success icon
+    CheckCircle,
+    ChevronLeft,
+    ChevronRight,
+    Package
 } from "lucide-react";
 
 const Products = () => {
@@ -28,7 +28,7 @@ const Products = () => {
 
     // --- STATES ---
     const [selectedCategory, setSelectedCategory] = useState("All");
-    const [searchQuery, setSearchQuery] = useState(""); // State for Search
+    const [searchQuery, setSearchQuery] = useState("");
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -36,8 +36,6 @@ const Products = () => {
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
     const [productToDelete, setProductToDelete] = useState(null);
     const [isDeleting, setIsDeleting] = useState(false);
-
-    // Success Message State
     const [showSuccessToast, setShowSuccessToast] = useState(false);
 
     useEffect(() => {
@@ -60,28 +58,20 @@ const Products = () => {
     };
 
     // --- HANDLERS ---
-
-    // 1. Open Delete Modal
     const confirmDelete = (productId) => {
         setProductToDelete(productId);
         setDeleteModalOpen(true);
     };
 
-    // 2. Execute Delete
     const executeDelete = async () => {
         if (!productToDelete) return;
 
         try {
             setIsDeleting(true);
             await api.delete(`/api/products/delete/${productToDelete}`);
-
-            // Update UI
             setProducts((prev) => prev.filter((p) => p._id !== productToDelete));
-
-            // Show Success Message
             setShowSuccessToast(true);
-            setTimeout(() => setShowSuccessToast(false), 3000); // Hide after 3 sec
-
+            setTimeout(() => setShowSuccessToast(false), 3000);
         } catch (error) {
             console.error("Delete failed", error);
         } finally {
@@ -92,36 +82,30 @@ const Products = () => {
     };
 
     // --- HELPER FUNCTIONS ---
+    const formatPrice = (price) => Math.floor(price);
 
-    // Truncate Text (For Name & Description)
-    const truncateText = (text, limit) => {
-        if (!text) return "";
-        return text.length > limit ? text.substring(0, limit) + "..." : text;
-    };
-
-    // Format Price (Remove decimals)
-    const formatPrice = (price) => {
-        return Math.floor(price); // 195.72 -> 195
-    };
-
-    // Filtering Logic (Category + Search)
     const filteredProducts = products.filter((product) => {
         const matchesCategory = selectedCategory === "All" || product.category === selectedCategory;
-        const matchesSearch = product.title.toLowerCase().includes(searchQuery.toLowerCase());
+        const matchesSearch = product.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            (product.productId && product.productId.toLowerCase().includes(searchQuery.toLowerCase()));
         return matchesCategory && matchesSearch;
     });
 
-    // --- SKELETON LOADER ---
-    const TableSkeleton = () => (
+    // --- CARD SKELETON LOADER ---
+    const CardSkeleton = () => (
         <>
-            {[...Array(5)].map((_, index) => (
-                <tr key={index} className="animate-pulse border-b border-gray-700/50">
-                    <td className="p-4"><div className="flex items-center gap-3"><div className="w-10 h-10 bg-gray-700 rounded-lg"></div><div className="h-4 bg-gray-700 rounded w-32"></div></div></td>
-                    <td className="p-4"><div className="h-4 bg-gray-700 rounded w-20"></div></td>
-                    <td className="p-4"><div className="h-4 bg-gray-700 rounded w-24"></div></td>
-                    <td className="p-4"><div className="h-4 bg-gray-700 rounded w-16"></div></td>
-                    <td className="p-4"><div className="flex justify-end gap-2"><div className="w-8 h-8 bg-gray-700 rounded-lg"></div><div className="w-8 h-8 bg-gray-700 rounded-lg"></div></div></td>
-                </tr>
+            {[...Array(10)].map((_, index) => (
+                <div key={index} className="bg-gray-800 rounded-xl overflow-hidden border border-gray-700 animate-pulse flex flex-col">
+                    <div className="h-48 bg-gray-700 w-full"></div>
+                    <div className="p-4 space-y-3 flex-1">
+                        <div className="h-4 bg-gray-700 rounded w-3/4"></div>
+                        <div className="h-3 bg-gray-700 rounded w-1/2"></div>
+                        <div className="flex justify-between pt-4 mt-auto">
+                            <div className="h-6 bg-gray-700 rounded w-16"></div>
+                            <div className="h-6 bg-gray-700 rounded w-8"></div>
+                        </div>
+                    </div>
+                </div>
             ))}
         </>
     );
@@ -171,7 +155,7 @@ const Products = () => {
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
                 <div>
                     <h1 className="text-2xl font-bold text-white tracking-tight">Products</h1>
-                    <p className="text-gray-400 text-sm mt-1">Dashboard / Products Management</p>
+                    <p className="text-gray-400 text-sm mt-1">Manage your inventory</p>
                 </div>
                 <button className="bg-blue-600 hover:bg-blue-500 hover:shadow-blue-500/20 text-white px-5 py-2.5 rounded-xl flex items-center gap-2 transition-all shadow-lg font-medium">
                     <Plus size={18} />
@@ -181,8 +165,6 @@ const Products = () => {
 
             {/* Filters & Search Section */}
             <div className="bg-gray-800 p-4 rounded-xl border border-gray-700/50 mb-6 flex flex-col md:flex-row justify-between items-center gap-4 shadow-xl">
-
-                {/* Category Filter */}
                 <div className="flex items-center gap-3 w-full md:w-auto">
                     <span className="text-gray-400 text-sm whitespace-nowrap font-medium">Filter by:</span>
                     <div className="relative w-full md:w-64 group">
@@ -195,17 +177,16 @@ const Products = () => {
                                 <option key={index} value={cat}>{cat}</option>
                             ))}
                         </select>
-                        <Filter size={16} className="absolute right-3 top-3 text-gray-500 group-hover:text-blue-400 transition-colors pointer-events-none" />
+                        <Filter size={16} className="absolute right-3 top-3 text-gray-500 pointer-events-none" />
                     </div>
                 </div>
 
-                {/* Search Bar (Updated Logic) */}
                 <div className="relative w-full md:w-72">
                     <input
                         type="text"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        placeholder="Search products..."
+                        placeholder="Search by Name or ID..."
                         className="w-full bg-gray-900 text-white border border-gray-600 rounded-lg pl-10 pr-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all placeholder-gray-500"
                     />
                     <Search size={18} className="absolute left-3 top-3 text-gray-500" />
@@ -217,112 +198,97 @@ const Products = () => {
                 </div>
             </div>
 
-            {/* Products Table */}
-            <div className="bg-gray-800 rounded-xl border border-gray-700/50 overflow-hidden shadow-2xl">
-                <div className="overflow-x-auto">
-                    <table className="w-full text-left border-collapse">
-                        <thead>
-                            <tr className="bg-gray-900/80 border-b border-gray-700 text-xs uppercase text-gray-400 tracking-wider">
-                                <th className="p-5 font-semibold">Product</th>
-                                <th className="p-5 font-semibold">Price</th>
-                                <th className="p-5 font-semibold">Category</th>
-                                <th className="p-5 font-semibold">Stock</th>
-                                <th className="p-5 font-semibold text-right">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-700/50">
-                            {loading ? (
-                                <TableSkeleton />
-                            ) : filteredProducts.length > 0 ? (
-                                filteredProducts.map((product) => (
-                                    <tr key={product._id} className="hover:bg-gray-700/30 border-l-2 border-l-transparent hover:border-l-blue-500 transition-all">
+            {/* 🔥 PRODUCTS GRID (5 Columns on XL) 🔥 */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
 
-                                        {/* Product Name (Truncated) & Image */}
-                                        <td className="p-4 flex items-center gap-4 min-w-[200px]">
-                                            <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-gray-700 border border-gray-600 shrink-0">
-                                                <img
-                                                    src={product.images?.[0]?.url || "/no-image.png"}
-                                                    alt={product.title}
-                                                    className="w-full h-full object-cover"
-                                                />
-                                            </div>
-                                            <div className="flex flex-col">
-                                                <span className="font-medium text-white" title={product.title}>
-                                                    {truncateText(product.title, 20)}
-                                                </span>
-                                                <span className="text-xs text-gray-500">
-                                                    {truncateText(product.description, 30)}
-                                                </span>
-                                            </div>
-                                        </td>
+                {loading ? (
+                    <CardSkeleton />
+                ) : filteredProducts.length > 0 ? (
+                    filteredProducts.map((product) => (
+                        <div
+                            key={product._id}
+                            className="bg-gray-800 rounded-xl overflow-hidden border border-gray-700 hover:border-blue-500/50 hover:shadow-xl hover:shadow-blue-500/10 transition-all group relative flex flex-col"
+                        >
+                            {/* Image Section */}
+                            <div className="h-48 overflow-hidden relative bg-gray-900">
+                                <img
+                                    src={product.images?.[0]?.url || "/no-image.png"}
+                                    alt={product.title}
+                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                />
 
-                                        {/* Price (Formatted) */}
-                                        <td className="p-4 text-gray-300 font-medium">
-                                            ₹{formatPrice(product.finalPrice || product.price)}
-                                        </td>
+                                {/* Overlay Gradient */}
+                                <div className="absolute inset-0 bg-linear-to-t from-gray-900/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 
-                                        {/* Category Badge */}
-                                        <td className="p-4">
-                                            <span className="bg-gray-700/50 text-blue-300 px-3 py-1 rounded-full text-xs font-medium border border-blue-500/10">
-                                                {product.category}
-                                            </span>
-                                        </td>
+                                {/* Floating Delete Button (Visible on Hover) */}
+                                <button
+                                    onClick={() => confirmDelete(product._id)}
+                                    className="absolute top-2 right-2 p-2 bg-black/50 hover:bg-red-600 text-white rounded-lg backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0"
+                                    title="Delete Product"
+                                >
+                                    <Trash2 size={16} />
+                                </button>
 
-                                        {/* Stock Status */}
-                                        <td className="p-4">
-                                            <span className={`px-3 py-1 rounded-full text-xs font-bold border flex w-fit items-center gap-1.5 ${product.quantity > 0 ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" : "bg-rose-500/10 text-rose-400 border-rose-500/20"}`}>
-                                                <span className={`w-1.5 h-1.5 rounded-full ${product.quantity > 0 ? 'bg-emerald-400' : 'bg-rose-400'}`}></span>
-                                                {product.quantity > 0 ? "In Stock" : "Out of Stock"}
-                                            </span>
-                                        </td>
+                                {/* Category Badge Overlay */}
+                                <span className="absolute bottom-2 left-2 text-[10px] font-bold uppercase tracking-wider bg-black/60 backdrop-blur-md text-white px-2 py-1 rounded">
+                                    {product.category}
+                                </span>
+                            </div>
 
-                                        {/* Actions (Delete Button Updated) */}
-                                        <td className="p-4 text-right">
-                                            <div className="flex items-center justify-end gap-2">
-                                                
-                                                {/* Delete Button Triggers Modal */}
-                                                <button
-                                                    onClick={() => confirmDelete(product._id)}
-                                                    className="p-2 text-gray-400 hover:text-white hover:bg-red-500 hover:shadow-lg hover:shadow-red-500/30 rounded-lg transition-all"
-                                                >
-                                                    <Trash2 size={18} />
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))
-                            ) : (
-                                <tr>
-                                    <td colSpan="5" className="p-12 text-center text-gray-500 flex flex-col items-center justify-center">
-                                        <div className="bg-gray-700/50 p-4 rounded-full mb-3">
-                                            <Search size={24} className="text-gray-400" />
-                                        </div>
-                                        <p className="text-lg font-medium text-gray-300">No products found</p>
-                                        <p className="text-sm">Try adjusting your filters or search query.</p>
-                                    </td>
-                                </tr>
-                            )}
-                        </tbody>
-                    </table>
-                </div>
+                            {/* Content Section */}
+                            <div className="p-4 flex flex-col flex-1">
+                                {/* Title */}
+                                <h3 className="font-semibold text-white truncate text-sm" title={product.title}>
+                                    {product.title}
+                                </h3>
 
-                {/* Pagination (Visual Only) */}
-                <div className="bg-gray-800 border-t border-gray-700/50 p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-                    <span className="text-sm text-gray-400">
-                        Showing <span className="text-white font-medium">1</span> to <span className="text-white font-medium">{filteredProducts.length}</span> results
-                    </span>
-                    <div className="flex items-center gap-2">
-                        <button className="p-2 border border-gray-600 rounded-lg text-gray-400 hover:bg-gray-700 hover:text-white transition-colors disabled:opacity-50">
-                            <ChevronLeft size={16} />
-                        </button>
-                        <button className="w-8 h-8 flex items-center justify-center bg-blue-600 text-white rounded-lg text-sm font-medium shadow-lg shadow-blue-600/20">1</button>
-                        <button className="p-2 border border-gray-600 rounded-lg text-gray-400 hover:bg-gray-700 hover:text-white transition-colors">
-                            <ChevronRight size={16} />
-                        </button>
+                                {/* 🔥 Product ID (Small below title) */}
+                                <div className="flex items-center gap-1.5 mt-1 mb-3">
+                                    <Package size={12} className="text-gray-500" />
+                                    <p className="text-xs text-gray-500 font-mono tracking-wide truncate">
+                                        ID: {product.productId || product._id || "N/A"}
+                                    </p>
+                                </div>
+
+                                {/* Price & Stock (Bottom aligned) */}
+                                <div className="mt-auto flex items-center justify-between border-t border-gray-700 pt-3">
+                                    <span className="text-lg font-bold text-white">
+                                        ₹{formatPrice(product.finalPrice || product.price)}
+                                    </span>
+
+                                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold border flex items-center gap-1 ${product.quantity > 0 ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" : "bg-rose-500/10 text-rose-400 border-rose-500/20"}`}>
+                                        <div className={`w-1.5 h-1.5 rounded-full ${product.quantity > 0 ? 'bg-emerald-400' : 'bg-rose-400'}`}></div>
+                                        {product.quantity > 0 ? "In Stock" : "Sold Out"}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    ))
+                ) : (
+                    /* No Results State */
+                    <div className="col-span-full flex flex-col items-center justify-center py-20 text-gray-500 bg-gray-800/50 rounded-xl border border-dashed border-gray-700">
+                        <div className="bg-gray-800 p-4 rounded-full mb-3 shadow-lg">
+                            <Search size={32} className="text-gray-400" />
+                        </div>
+                        <p className="text-lg font-medium text-gray-300">No products found</p>
+                        <p className="text-sm">Try adjusting your filters or search query.</p>
                     </div>
-                </div>
-
+                )}
             </div>
+
+            {/* Pagination (Optional - keeping visual layout consistent) */}
+            <div className="mt-8 flex justify-center">
+                <div className="flex gap-2">
+                    <button className="p-2 border border-gray-700 bg-gray-800 rounded-lg text-gray-400 hover:text-white hover:border-gray-500 disabled:opacity-50">
+                        <ChevronLeft size={20} />
+                    </button>
+                    <button className="w-10 h-10 flex items-center justify-center bg-blue-600 text-white rounded-lg font-bold shadow-lg shadow-blue-600/20">1</button>
+                    <button className="p-2 border border-gray-700 bg-gray-800 rounded-lg text-gray-400 hover:text-white hover:border-gray-500 disabled:opacity-50">
+                        <ChevronRight size={20} />
+                    </button>
+                </div>
+            </div>
+
         </div>
     );
 };

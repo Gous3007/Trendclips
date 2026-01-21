@@ -30,6 +30,7 @@ const Sidebar = () => {
         { name: "Edit Product", path: "/trendclips/secure-panel-x308/dashboard/edit", icon: <Pencil size={20} /> },
         // { name: "Customers", path: "/trendclips/secure-panel-x308/dashboard/customers", icon: <Users size={20} /> },
         { name: "Showcase", path: "/trendclips/secure-panel-x308/dashboard/showcase", icon: <ClipboardList size={20} /> },
+        { name: "Contact Us", path: "/trendclips/secure-panel-x308/dashboard/contact", icon: <ClipboardList size={20} /> },
     ];
 
     const handleLogout = async () => {
@@ -103,16 +104,47 @@ const Sidebar = () => {
                 </div>
 
                 {/* ➕ Bottom Action */}
-                <div className="p-4">
-                    <button className="w-full bg-sky-500 hover:bg-sky-600 text-white font-semibold py-3 rounded-lg flex items-center justify-center gap-2 shadow-lg mb-5">
+                <div className="p-4 border-t border-gray-700 bg-gray-800/60 backdrop-blur">
+
+                    {/* Add Product */}
+                    <button
+                        className="
+            w-full mb-4
+            bg-linear-to-r from-sky-500 to-blue-600
+            hover:from-sky-400 hover:to-blue-500
+            text-white font-semibold
+            py-3 rounded-xl
+            flex items-center justify-center gap-2
+            shadow-lg shadow-sky-500/20
+            transition-all duration-200
+            hover:scale-[1.02]
+            active:scale-[0.98]
+        "
+                    >
                         <Plus size={18} />
                         Add Product
                     </button>
-                    <button onClick={handleLogout} className="w-full bg-red-500 hover:bg-red-400 text-white font-semibold py-3 rounded-lg flex items-center justify-center gap-2 shadow-lg">
+
+                    {/* Logout */}
+                    <button
+                        onClick={handleLogout}
+                        className="
+            w-full
+            bg-gray-700 hover:bg-red-500/90
+            text-gray-300 hover:text-white
+            font-semibold
+            py-3 rounded-xl
+            flex items-center justify-center gap-2
+            border border-gray-600 hover:border-red-400
+            transition-all duration-200
+        "
+                    >
                         <ArrowLeftIcon size={18} />
                         Logout
                     </button>
+
                 </div>
+
             </aside>
         </>
     );

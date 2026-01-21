@@ -19,6 +19,8 @@ import Order from "./pages/dashboard/Order.jsx"
 import AddProduct from "./pages/dashboard/AddProduct.jsx";
 import EditProductPage from "./pages/dashboard/EditProductPage.jsx";
 import ShowcaseManager from "./pages/dashboard/ShowcaseManager.jsx";
+import OrderDetails from "./pages/dashboard/AdminOrderDetail.jsx";
+import ContactPage from "./pages/dashboard/ContactPage.jsx";
 import { initLenis, destroyLenis } from "./utils/lenis";
 import PageLoaderWrapper from "./components/Loaders/PageLoaderWrapper.jsx";
 import AdminLogin from "./pages/AdminLogin.jsx";
@@ -78,6 +80,8 @@ const AnimatedRoutes = () => {
               <Route path="add" element={<AddProduct />} />
               <Route path="edit" element={<EditProductPage />} />
               <Route path="showcase" element={<ShowcaseManager />} />
+              <Route path="details/:id" element={<OrderDetails />} />
+              <Route path="contact" element={<ContactPage />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>

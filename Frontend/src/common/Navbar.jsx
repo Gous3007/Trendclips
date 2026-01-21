@@ -12,10 +12,10 @@ import {
   X,
   User,
   Heart,
+  Package // Added Package icon for orders
 } from "lucide-react";
 
 const Navbar = () => {
-
   const [searchText, setSearchText] = useState("");
   const [mobileSearch, setMobileSearch] = useState("");
   const navigate = useNavigate();
@@ -30,12 +30,17 @@ const Navbar = () => {
     0
   );
 
-
   const handleMobileSearch = () => {
     if (!mobileSearch.trim()) return;
-
     navigate(`/shop?search=${encodeURIComponent(mobileSearch)}`);
     setMobileSearch("");
+    setIsMobileMenuOpen(false); // Close menu after search
+  };
+
+  // Helper to handle category click on mobile
+  const handleCategoryClick = (category) => {
+    navigate(`/shop/${category}`);
+    setIsMobileMenuOpen(false); // Close menu after clicking category
   };
 
   // Handle Scroll Effect for Header Shadow
@@ -48,12 +53,12 @@ const Navbar = () => {
   // Handle Body Scroll Lock when Mobile Menu is Open
   useEffect(() => {
     if (isMobileMenuOpen) {
-      document.body.style.overflow = "hidden"; // Piche ka scroll band
+      document.body.style.overflow = "hidden";
     } else {
-      document.body.style.overflow = "unset"; // Normal scroll chalu
+      document.body.style.overflow = "unset";
     }
     return () => {
-      document.body.style.overflow = "unset"; // Cleanup
+      document.body.style.overflow = "unset";
     };
   }, [isMobileMenuOpen]);
 
@@ -71,7 +76,6 @@ const Navbar = () => {
     "Home & Kitchen",
     "Stationery",
   ];
-
 
   useEffect(() => {
     if (guestId) {
@@ -104,13 +108,13 @@ const Navbar = () => {
               </div>
             </div>
             <div className="flex items-center gap-6">
-              <Link to="/account" className="hover:text-gray-300">
-                Account
+              <Link to="/my-orders" className="hover:text-gray-300">
+                Your Orders
               </Link>
               <Link to="/shop" className="hover:text-gray-300">
                 Returns & Orders
               </Link>
-              <Link to="/help" className="hover:text-gray-300">
+              <Link to="/contact" className="hover:text-gray-300">
                 Customer Service
               </Link>
             </div>
@@ -247,7 +251,6 @@ const Navbar = () => {
       <div className="hidden md:block border-t border-gray-200 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4">
           <nav className="flex items-center justify-between h-10">
-            {/* UPDATED: Added ml-4 and increased gap for better spacing */}
             <div className="flex items-center gap-8 ml-4">
               <button className="flex items-center gap-1 text-sm font-bold text-gray-700 hover:text-orange-600 cursor-pointer">
                 <Menu size={18} /> All
@@ -268,7 +271,6 @@ const Navbar = () => {
               ))}
             </div>
 
-            {/* Offers */}
             <div className="flex items-center">
               <span className="text-sm font-bold text-gray-800 cursor-pointer hover:text-orange-600">
                 Great Freedom Sale
@@ -282,19 +284,40 @@ const Navbar = () => {
       {isMobileMenuOpen && (
         <div
           className="md:hidden fixed left-0 right-0 bottom-0 bg-white z-40 overflow-y-auto shadow-inner"
-          // Height calculation: 100vh minus header height (approx 135px)
           style={{ top: "135px", height: "calc(100vh - 135px)" }}
         >
           <div className="px-4 py-4 space-y-4 pb-20">
-            {/* User Greeting - Amazon Style */}
-            <div className="bg-gray-100 -mx-4 -mt-4 p-4 flex items-center gap-3 border-b">
-              <div className="bg-white p-2 rounded-full">
-                <User size={20} className="text-gray-600" />
+
+            {/* --- NEW LOGIC: Mobile Account Header --- */}
+            {guestId && hasOrders ? (
+              // If user has orders: Show name and link to My Orders
+              <Link
+                to="/my-orders"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="bg-orange-50 -mx-4 -mt-4 p-4 flex items-center gap-3 border-b border-orange-100"
+              >
+                <div className="bg-orange-500 text-white w-10 h-10 rounded-full flex items-center justify-center font-bold">
+                  {guestId.slice(6, 8).toUpperCase()}
+                </div>
+                <div className="flex flex-col">
+                  <span className="font-bold text-lg text-gray-900">
+                    Hello, User
+                  </span>
+                  <span className="text-xs text-orange-600 font-medium">Click to view orders</span>
+                </div>
+              </Link>
+            ) : (
+              // Default Guest View
+              <div className="bg-gray-100 -mx-4 -mt-4 p-4 flex items-center gap-3 border-b">
+                <div className="bg-white p-2 rounded-full">
+                  <User size={20} className="text-gray-600" />
+                </div>
+                <span className="font-bold text-lg text-gray-800">
+                  Hello, Welcome
+                </span>
               </div>
-              <span className="font-bold text-lg text-gray-800">
-                Hello, Sign in
-              </span>
-            </div>
+            )}
+            {/* -------------------------------------- */}
 
             <div className="text-sm font-bold text-gray-900 uppercase pt-2">
               Trending
@@ -305,9 +328,12 @@ const Navbar = () => {
             <div className="text-sm font-bold text-gray-900 uppercase mb-2">
               Shop By Category
             </div>
+
+            {/* --- NEW LOGIC: Clickable Categories --- */}
             {categories.map((category) => (
               <button
                 key={category}
+                onClick={() => handleCategoryClick(category)}
                 className="block w-full text-left py-3 px-2 font-medium text-gray-600 border-b border-gray-50 hover:bg-gray-50 hover:text-orange-500"
               >
                 {category}
@@ -322,7 +348,7 @@ const Navbar = () => {
                 <NavLink
                   key={link.name}
                   to={link.path}
-                  onClick={() => setIsMobileMenuOpen(false)}
+                  onClick={() => setIsMobileMenuOpen(false)} // Close menu on click
                   className={({ isActive }) =>
                     `block py-3 px-2 font-medium rounded-lg ${isActive
                       ? "text-orange-500 bg-orange-50"
@@ -336,14 +362,19 @@ const Navbar = () => {
             </div>
 
             <div className="border-t border-gray-200 pt-3 space-y-2">
-              <Link
-                to="/account"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="flex items-center gap-3 py-2 px-2 font-medium text-gray-600 hover:bg-gray-50"
-              >
-                <User size={20} />
-                Your Account
-              </Link>
+
+              {/* Added explicit My Orders link in menu list too */}
+              {guestId && hasOrders && (
+                <Link
+                  to="/my-orders"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="flex items-center gap-3 py-2 px-2 font-medium text-gray-600 hover:bg-gray-50"
+                >
+                  <Package size={20} />
+                  Your Orders
+                </Link>
+              )}
+
               <Link
                 to="/wishlist"
                 onClick={() => setIsMobileMenuOpen(false)}
@@ -353,7 +384,7 @@ const Navbar = () => {
                 Your Wishlist
               </Link>
               <Link
-                to="/help"
+                to="/contact"
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="flex items-center gap-3 py-2 px-2 font-medium text-gray-600 hover:bg-gray-50"
               >

@@ -225,6 +225,16 @@ const AddTocart = () => {
                     </div>
 
                     <button
+                        onClick={() =>
+                            navigate("/address", {
+                                state: {
+                                    cartItems,
+                                    subtotal,
+                                    deliveryFee,
+                                    finalTotal
+                                }
+                            })
+                        }
                         disabled={hasStockError || cartItems.length === 0}
                         className={`flex-1 px-4 py-3 rounded-lg font-bold text-sm shadow-sm transition-colors
                              ${hasStockError
