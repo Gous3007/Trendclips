@@ -10,7 +10,12 @@ const ShowcaseRoute = require("./routes/showcaseRoutes.js");
 const addressRoutes = require("./routes/addressRoutes.js");
 const adminRoutes = require("./routes/adminRoutes.js");
 const paymentRoutes = require("./routes/paymentRoutes");
-const adminSetupRoute = require("./routes/adminSetup.js");
+const dashboardStateRoutes = require("./routes/dashboardStateRoutes");
+const dashboardAnalyticsRoutes = require("./routes/dashboardAnalyticsRoutes.js");
+const adminRecnetOrder = require("./routes/adminRecentOrders.js");
+const adminOrderPage = require("./routes/adminOrders.js");
+const adminShippingRoutes = require("./routes/adminDetailsOrders.js");
+const contactRoutes = require("./routes/contactRoutes");
 
 const app = express();
 app.use(cookieParser());
@@ -38,15 +43,24 @@ app.use("/api/showcase", ShowcaseRoute);
 app.use("/api", addressRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/payment", paymentRoutes);
-app.use("/api/setup", adminSetupRoute);
+app.use("/api/dashboard", dashboardStateRoutes);
+app.use("/api/dashboard", dashboardAnalyticsRoutes);
+app.use("/api/dashboard", adminRecnetOrder);
+app.use("/api/dashboard", adminOrderPage);
+app.use("/api/dashboard", adminShippingRoutes);
+app.use("/api", contactRoutes);
+
+
 // --------------------
 // React Build Serve
 // --------------------
+
 app.use(express.static(path.join(__dirname, "dist")));
 
 // --------------------
 // SPA Fallback (FIXED ✅)
 // --------------------
+
 app.use((req, res) => {
     res.sendFile(path.join(__dirname, "dist", "index.html"));
 });

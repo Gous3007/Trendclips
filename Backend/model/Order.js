@@ -42,6 +42,10 @@ const orderSchema = new mongoose.Schema(
             country: String
         },
 
+        shippingPdf: {
+            type: String
+        },
+
         priceDetails: {
             subtotal: Number,
             deliveryFee: Number,
