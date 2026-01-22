@@ -17,6 +17,12 @@ const productSchema = new mongoose.Schema(
             type: String
         },
 
+        packOf: {
+            type: Number,
+            required: false,
+            default: 1,
+        },
+
         images: [
             {
                 public_id: String,
@@ -46,7 +52,8 @@ const productSchema = new mongoose.Schema(
                 "Headbands",
                 "Barrettes",
                 "Home & Kitchen",
-                "Stationery"
+                "Stationery",
+                "Other"
             ],
             required: true
         },

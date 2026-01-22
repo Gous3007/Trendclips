@@ -7,7 +7,8 @@ const categoryPrefixMap = {
     "Headbands": "HB",
     "Barrettes": "BR",
     "Home & Kitchen": "HK",
-    "Stationery": "ST"
+    "Stationery": "ST",
+    "Other": "OT"
 };
 
 const streamUpload = (buffer) => {
@@ -51,7 +52,8 @@ exports.createProduct = async (req, res) => {
             price,
             discount,
             category,
-            quantity
+            quantity,
+            packOf
         } = req.body;
 
         if (!title || !price || !category) {
@@ -86,6 +88,7 @@ exports.createProduct = async (req, res) => {
             productId,
             title,
             description,
+            packOf: packOf ? Number(packOf) : 1,
             images: uploadedImages,
             price,
             discount,
