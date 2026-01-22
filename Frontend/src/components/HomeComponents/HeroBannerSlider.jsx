@@ -11,7 +11,7 @@ const slides = [
         alt: "Fashion model 2"
     },
     {
-        url: "https://res.cloudinary.com/drppaqhmd/image/upload/v1765706970/qvejiaid1awca40ubjhm.png",
+        url: "https://res.cloudinary.com/drppaqhmd/image/upload/v1769098684/lkoov57oooo3cpwoda8b.webp",
         alt: "Fashion model 3"
     }
 ];

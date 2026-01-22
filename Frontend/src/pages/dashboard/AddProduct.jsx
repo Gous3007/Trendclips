@@ -20,6 +20,7 @@ const AddProductPage = () => {
     const [quantity, setQuantity] = useState("");
     const [loading, setLoading] = useState(false);
     const [successMsg, setSuccessMsg] = useState("");
+    const [packOf, setPackOf] = useState("");
 
     const handleSaveProduct = async () => {
         try {
@@ -36,6 +37,7 @@ const AddProductPage = () => {
             formData.append("discount", discount);
             formData.append("category", category);
             formData.append("quantity", quantity);
+            formData.append("packOf", packOf);
 
             selectedImages.forEach((img) => {
                 formData.append("images", img.file);
@@ -221,7 +223,36 @@ const AddProductPage = () => {
                                 </div>
                                 <div>
                                     <label className="block text-sm font-medium text-gray-300 mb-1.5">Product Description</label>
-                                    <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows="5" placeholder="Describe the product details..." className="w-full bg-gray-900 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all resize-none"></textarea>
+                                    <textarea
+                                        value={description}
+                                        onChange={(e) => setDescription(e.target.value)}
+                                        rows="6"
+                                        placeholder={`Write product description like:
+• Premium quality material
+• Comfortable for daily use
+• Long-lasting & durable
+
+You can also write paragraphs.`}
+                                        className="w-full bg-gray-900 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-300 mb-1.5">
+                                        Pack Of
+                                    </label>
+
+                                    <input
+                                        type="number"
+                                        min="1"
+                                        value={packOf}
+                                        onChange={(e) => setPackOf(e.target.value)}
+                                        placeholder="e.g. 2, 4, 6"
+                                        className="w-full bg-gray-900 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
+                                    />
+
+                                    <p className="text-xs text-gray-400 mt-1">
+                                        Enter number of items included in one pack (e.g. Pack of 4)
+                                    </p>
                                 </div>
                             </div>
                         </div>
@@ -298,6 +329,7 @@ const AddProductPage = () => {
                                                 <option>Barrettes</option>
                                                 <option>Home & Kitchen</option>
                                                 <option>Stationery</option>
+                                                <option>Other</option>
                                             </select>
                                             <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
                                         </div>

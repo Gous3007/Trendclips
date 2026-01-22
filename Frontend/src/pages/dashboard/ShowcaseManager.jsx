@@ -94,7 +94,6 @@ const ShowcaseManager = () => {
         }
     };
 
-    // --- Submit Logic ---
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -111,19 +110,21 @@ const ShowcaseManager = () => {
 
         try {
             const res = await api.post("/api/showcase/add", data);
-            if (res.ok) {
+
+            // ✅ Axios success check
+            if (res.status === 200 || res.status === 201) {
                 showNotification("Product added successfully!", "success");
                 closeModal();
                 fetchData();
-            } else {
-                throw new Error("Failed to add");
             }
         } catch (error) {
+            console.error(error);
             showNotification("Error adding product", "error");
         } finally {
             setIsLoading(false);
         }
     };
+
 
     const closeModal = () => {
         setIsModalOpen(false);

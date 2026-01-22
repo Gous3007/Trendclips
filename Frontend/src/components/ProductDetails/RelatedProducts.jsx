@@ -97,11 +97,6 @@ const RelatedProducts = ({ currentCategory, currentProductId }) => {
                                         prime
                                     </span>
                                 </div>
-
-                                {/* Delivery Info */}
-                                <p className="text-xs text-gray-600 mt-1">
-                                    Get it by <span className="font-semibold text-gray-900">Tomorrow</span>
-                                </p>
                             </div>
                         </div>
                     ))}
@@ -109,7 +104,9 @@ const RelatedProducts = ({ currentCategory, currentProductId }) => {
 
                 {/* View More Button */}
                 <div className="mt-8 text-center">
-                    <button className="px-6 py-3 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-900 hover:bg-gray-50 transition-colors shadow-sm">
+                    <button
+                        onClick={() => navigate(`/shop`)}
+                        className="px-6 py-3 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-900 hover:bg-gray-50 transition-colors shadow-sm">
                         View More Products
                     </button>
                 </div>

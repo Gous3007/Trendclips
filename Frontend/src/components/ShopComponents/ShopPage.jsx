@@ -91,7 +91,7 @@ const ShopPage = () => {
   const [viewMode, setViewMode] = useState("grid");
   const [favorites, setFavorites] = useState([]);
 
-  const categories = ["Scrunchies", "Headbands", "Hair Clips", "Barrettes", "Home & Kitchen", "Stationery"];
+  const categories = ["Scrunchies", "Headbands", "Hair Clips", "Barrettes", "Home & Kitchen", "Stationery", "Other"];
   const sortOptions = [
     { value: "", label: "Sort by" },
     { value: "price-low", label: "Price: Low to High" },
@@ -149,11 +149,27 @@ const ShopPage = () => {
     );
   };
 
+  const getDeliveryDays = (id) => {
+    const days = [4, 5, 6, 7, 8, 9];
+
+    let hash = 0;
+    if (typeof id === "string") {
+      for (let i = 0; i < id.length; i++) {
+        hash += id.charCodeAt(i);
+      }
+    } else {
+      hash = id || 1;
+    }
+
+    return days[hash % days.length];
+  };
+
   const clearFilters = () => {
     setSelectedCategories([]);
     setPriceRange(2000);
     setSearchQuery("");
   };
+
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-800 font-sans">
@@ -284,6 +300,7 @@ const ShopPage = () => {
           ) : (
             <div className={`grid ${viewMode === "grid" ? "grid-cols-2 md:grid-cols-2 lg:grid-cols-3" : "grid-cols-1"} gap-4 md:gap-6`}>
               {displayedProducts.map((product, index) => {
+                const deliveryDays = getDeliveryDays(product._id);
                 // Determine Badge Status
                 const isBestSeller = product.isBestSeller || index % 8 === 0;
                 const isPrime = product.prime || index % 8 === 2;
@@ -351,7 +368,14 @@ const ShopPage = () => {
                           <span className="text-xs text-slate-400 line-through">₹{product.price}</span>
                         </div>
                         <div className="text-[10px] md:text-xs text-green-600 font-medium mt-0.5">
-                          Delivery by {new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
+                          Delivery by{" "}
+                          {new Date(
+                            Date.now() + deliveryDays * 24 * 60 * 60 * 1000
+                          ).toLocaleDateString("en-US", {
+                            weekday: "short",
+                            month: "short",
+                            day: "numeric",
+                          })}
                         </div>
                       </div>
 

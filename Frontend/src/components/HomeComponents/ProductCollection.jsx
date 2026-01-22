@@ -13,6 +13,7 @@ const categories = [
     { id: 4, name: "Barrettes", image: "https://m.media-amazon.com/images/I/71+Oqacy34L._AC_UL480_FMwebp_QL65_.jpg" },
     { id: 5, name: "Home & Kitchen", image: "https://m.media-amazon.com/images/I/51yc7Nsy73L._AC_UL480_FMwebp_QL65_.jpg" },
     { id: 6, name: "Stationery", image: "https://m.media-amazon.com/images/I/8115Djt33ML._AC_UL480_FMwebp_QL65_.jpg" },
+    { id: 7, name: "Other", image: "https://res.cloudinary.com/drppaqhmd/image/upload/v1769096516/net8i4t3j7xzutpl3xwm.webp" },
 ];
 
 // --- SKELETON LOADER COMPONENT ---

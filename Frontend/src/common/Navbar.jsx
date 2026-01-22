@@ -75,6 +75,7 @@ const Navbar = () => {
     "Barrettes",
     "Home & Kitchen",
     "Stationery",
+    "Other"
   ];
 
   useEffect(() => {
@@ -375,14 +376,6 @@ const Navbar = () => {
                 </Link>
               )}
 
-              <Link
-                to="/wishlist"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="flex items-center gap-3 py-2 px-2 font-medium text-gray-600 hover:bg-gray-50"
-              >
-                <Heart size={20} />
-                Your Wishlist
-              </Link>
               <Link
                 to="/contact"
                 onClick={() => setIsMobileMenuOpen(false)}

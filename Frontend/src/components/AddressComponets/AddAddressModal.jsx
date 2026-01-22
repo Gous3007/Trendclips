@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { X, MapPin, Home, Briefcase, ChevronDown } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { X, ChevronDown, Check } from 'lucide-react';
 
 // --- ALL INDIA STATES & UTs LIST ---
 const INDIAN_STATES = [
@@ -41,23 +41,44 @@ const INDIAN_STATES = [
     "West Bengal"
 ];
 
-const AddAddressModal = ({ isOpen, onClose, onSave }) => {
-    // Form State
+const AddAddressModal = ({ isOpen, onClose, onSave, editData }) => {
+
     const [formData, setFormData] = useState({
-        name: '',
-        mobile: '',
-        email:'',
-        pincode: '',
-        flat: '',
-        area: '',
-        landmark: '',
-        state: '',
-        district: '',
-        tehsil: '',
-        city: '',
+        name: "",
+        mobile: "",
+        email: "",
+        pincode: "",
+        flat: "",
+        area: "",
+        landmark: "",
+        state: "",
+        district: "",
+        tehsil: "",
+        city: "",
         isDefault: false,
-        type: 'Home'
+        type: "Home",
     });
+
+    // Form State
+    useEffect(() => {
+        if (editData) {
+            setFormData({
+                name: editData.name || "",
+                mobile: editData.mobile || "",
+                email: editData.email || "",
+                pincode: editData.pincode || "",
+                flat: editData.flat || "",
+                area: editData.area || "",
+                landmark: editData.landmark || "",
+                state: editData.state || "",
+                district: editData.district || "",
+                tehsil: editData.tehsil || "",
+                city: editData.city || "",
+                isDefault: editData.isDefault || false,
+                type: editData.addressType || "Home",
+            });
+        }
+    }, [editData]);
 
     if (!isOpen) return null;
 
@@ -76,250 +97,258 @@ const AddAddressModal = ({ isOpen, onClose, onSave }) => {
         onClose();
     };
 
+    // Reusable Input Styles matching Amazon
+    const inputClasses = "w-full px-3 py-2 bg-white border border-gray-400 rounded-[4px] shadow-[0_1px_2px_rgba(0,0,0,0.1)_inset] focus:border-[#e77600] focus:ring-[3px] focus:ring-[#fbd8b4] outline-none transition-all text-sm text-gray-900 placeholder-gray-500";
+    const labelClasses = "block text-sm font-bold text-gray-900 mb-1";
+
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-0 md:p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-[2px] p-0 md:p-4">
+
             {/* Modal Container */}
-            <div className="bg-white w-full h-full md:h-auto md:max-h-[90vh] md:max-w-2xl md:rounded-xl shadow-2xl overflow-hidden flex flex-col animate-in slide-in-from-bottom-5 duration-300">
+            <div className="bg-white w-full h-full md:h-auto md:max-h-[90vh] md:max-w-2xl md:rounded-lg shadow-2xl overflow-hidden flex flex-col animate-in slide-in-from-bottom-2 duration-200">
 
                 {/* --- Header --- */}
-                <div className="bg-white px-6 py-4 flex justify-between items-center border-b sticky top-0 z-10">
+                <div className="bg-[#f0f2f2] px-6 py-4 flex justify-between items-center border-b border-[#d5d9d9] sticky top-0 z-10">
                     <div>
-                        <h2 className="text-xl font-bold text-gray-800">Add Delivery Address</h2>
-                        <p className="text-xs text-gray-500">Please fill in accurate details</p>
+                        <h2 className="text-lg font-bold text-gray-900 leading-tight">
+                            {editData ? "Edit your address" : "Add a new address"}
+                        </h2>
                     </div>
-                    <button onClick={onClose} className="p-2 bg-gray-100 rounded-full text-gray-600 hover:bg-red-50 hover:text-red-600 transition-colors">
-                        <X size={20} />
+                    <button onClick={onClose} className="text-gray-600 hover:text-gray-900 transition-colors">
+                        <X size={24} />
                     </button>
                 </div>
 
                 {/* --- Form Body (Scrollable) --- */}
-                <div className="flex-1 overflow-y-auto custom-scrollbar p-4 md:p-8 bg-gray-50">
-                    <form id="addressForm" onSubmit={handleSubmit} className="space-y-6">
+                <div className="flex-1 overflow-y-auto p-4 md:p-8 bg-white">
+                    <form id="addressForm" onSubmit={handleSubmit} className="space-y-6 max-w-xl mx-auto">
 
-                        {/* Location Section */}
-                        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-                            <h3 className="text-sm font-bold text-blue-600 mb-4 flex items-center gap-2">
-                                <MapPin size={16} /> LOCATION DETAILS
-                            </h3>
+                        {/* Country (Static for visual context) */}
+                        <div className="mb-2">
+                            <label className={labelClasses}>Country/Region</label>
+                            <div className="w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-sm text-sm font-bold text-gray-600 shadow-inner">
+                                India
+                            </div>
+                        </div>
+
+                        {/* Personal Info */}
+                        <div className="space-y-4">
+                            <div>
+                                <label className={labelClasses}>Full name (First and Last name)</label>
+                                <input
+                                    type="text"
+                                    name="name"
+                                    value={formData.name}
+                                    onChange={handleChange}
+                                    required
+                                    className={inputClasses}
+                                />
+                            </div>
+
+                            <div>
+                                <label className={labelClasses}>Mobile number</label>
+                                <div className="relative">
+                                    <input
+                                        type="tel"
+                                        name="mobile"
+                                        value={formData.mobile}
+                                        onChange={handleChange}
+                                        required
+                                        maxLength="10"
+                                        placeholder="10-digit mobile number without prefixes"
+                                        className={inputClasses}
+                                    />
+                                </div>
+                                <p className="text-xs text-gray-500 mt-1">May be used to assist delivery</p>
+                            </div>
+
+                            <div>
+                                <label className={labelClasses}>Email (Optional)</label>
+                                <input
+                                    type="text"
+                                    name="email"
+                                    value={formData.email}
+                                    onChange={handleChange}
+                                    className={inputClasses}
+                                />
+                            </div>
+                        </div>
+
+                        {/* Address Details */}
+                        <div className="space-y-4">
+                            <div>
+                                <label className={labelClasses}>Pincode</label>
+                                <input
+                                    type="text"
+                                    name="pincode"
+                                    value={formData.pincode}
+                                    onChange={handleChange}
+                                    required
+                                    maxLength="6"
+                                    placeholder="6 digits [0-9] PIN code"
+                                    className={`${inputClasses} w-1/2`}
+                                />
+                            </div>
+
+                            <div>
+                                <label className={labelClasses}>Flat, House no., Building, Company, Apartment</label>
+                                <input
+                                    type="text"
+                                    name="flat"
+                                    value={formData.flat}
+                                    onChange={handleChange}
+                                    required
+                                    className={inputClasses}
+                                />
+                            </div>
+
+                            <div>
+                                <label className={labelClasses}>Area, Street, Sector, Village</label>
+                                <input
+                                    type="text"
+                                    name="area"
+                                    value={formData.area}
+                                    onChange={handleChange}
+                                    required
+                                    className={inputClasses}
+                                />
+                            </div>
+
+                            <div>
+                                <label className={labelClasses}>Landmark</label>
+                                <input
+                                    type="text"
+                                    name="landmark"
+                                    value={formData.landmark}
+                                    onChange={handleChange}
+                                    placeholder="E.g. near Apollo Hospital"
+                                    className={inputClasses}
+                                />
+                            </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {/* State Select (Only Dropdown) */}
-                                <div className="relative">
-                                    <label className="block text-xs font-bold text-gray-500 mb-1 uppercase">State</label>
-                                    <div className="relative">
-                                        <select
-                                            name="state"
-                                            value={formData.state}
-                                            onChange={handleChange}
-                                            required
-                                            className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 appearance-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none cursor-pointer"
-                                        >
-                                            <option value="">Select State</option>
-                                            {INDIAN_STATES.map((state, index) => (
-                                                <option key={index} value={state}>{state}</option>
-                                            ))}
-                                        </select>
-                                        <ChevronDown className="absolute right-3 top-3 text-gray-400 pointer-events-none" size={16} />
-                                    </div>
-                                </div>
-
-                                {/* District Input (Manual) */}
                                 <div>
-                                    <label className="block text-xs font-bold text-gray-500 mb-1 uppercase">District</label>
-                                    <input
-                                        type="text"
-                                        name="district"
-                                        value={formData.district}
-                                        onChange={handleChange}
-                                        required
-                                        placeholder="Enter District"
-                                        className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                                    />
-                                </div>
-
-                                {/* Tehsil Input (Manual) */}
-                                <div>
-                                    <label className="block text-xs font-bold text-gray-500 mb-1 uppercase">Tehsil / Taluka</label>
-                                    <input
-                                        type="text"
-                                        name="tehsil"
-                                        value={formData.tehsil}
-                                        onChange={handleChange}
-                                        required
-                                        placeholder="Enter Tehsil"
-                                        className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                                    />
-                                </div>
-
-                                {/* City/Town Input (Manual) */}
-                                <div>
-                                    <label className="block text-xs font-bold text-gray-500 mb-1 uppercase">Village / Town</label>
+                                    <label className={labelClasses}>Town/City</label>
                                     <input
                                         type="text"
                                         name="city"
                                         value={formData.city}
                                         onChange={handleChange}
                                         required
-                                        placeholder="Enter Village/Town"
-                                        className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                                        className={inputClasses}
                                     />
                                 </div>
-                            </div>
-                        </div>
-
-                        {/* Personal Info Section */}
-                        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-                            <h3 className="text-sm font-bold text-blue-600 mb-4">CONTACT INFO</h3>
-                            <div className="space-y-4">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-                                    <input
-                                        type="text"
-                                        name="name"
-                                        value={formData.name}
-                                        onChange={handleChange}
-                                        required
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 outline-none transition-all"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                                    <input
-                                        type="text"
-                                        name="email"
-                                        value={formData.email}
-                                        onChange={handleChange}
-                                        required
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 outline-none transition-all"
-                                    />
-                                </div>
-
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">Mobile Number</label>
-                                        <div className="relative">
-                                            <span className="absolute left-3 top-2 text-gray-500 font-medium">+91</span>
-                                            <input
-                                                type="tel"
-                                                name="mobile"
-                                                value={formData.mobile}
-                                                onChange={handleChange}
-                                                required
-                                                maxLength="10"
-                                                className="w-full pl-12 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-400 outline-none"
-                                            />
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">Pincode</label>
-                                        <input
-                                            type="text"
-                                            name="pincode"
-                                            value={formData.pincode}
+                                <div className="relative">
+                                    <label className={labelClasses}>State</label>
+                                    <div className="relative">
+                                        <select
+                                            name="state"
+                                            value={formData.state}
                                             onChange={handleChange}
                                             required
-                                            maxLength="6"
-                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-400 outline-none"
-                                        />
+                                            className={`${inputClasses} appearance-none cursor-pointer bg-gray-50`}
+                                        >
+                                            <option value="">Select State</option>
+                                            {INDIAN_STATES.map((state, index) => (
+                                                <option key={index} value={state}>{state}</option>
+                                            ))}
+                                        </select>
+                                        <ChevronDown className="absolute right-2 top-2.5 text-gray-500 pointer-events-none" size={16} />
                                     </div>
                                 </div>
                             </div>
-                        </div>
 
-                        {/* Address Specifics */}
-                        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-                            <h3 className="text-sm font-bold text-blue-600 mb-4">ADDRESS DETAILS</h3>
-                            <div className="space-y-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Flat, House no., Building, Company</label>
+                                    <label className={labelClasses}>District</label>
                                     <input
                                         type="text"
-                                        name="flat"
-                                        value={formData.flat}
+                                        name="district"
+                                        value={formData.district}
                                         onChange={handleChange}
                                         required
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-400 outline-none"
+                                        className={inputClasses}
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Area, Street, Sector</label>
+                                    <label className={labelClasses}>Tehsil / Taluka</label>
                                     <input
                                         type="text"
-                                        name="area"
-                                        value={formData.area}
+                                        name="tehsil"
+                                        value={formData.tehsil}
                                         onChange={handleChange}
                                         required
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-400 outline-none"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Landmark (Optional)</label>
-                                    <input
-                                        type="text"
-                                        name="landmark"
-                                        value={formData.landmark}
-                                        onChange={handleChange}
-                                        placeholder="E.g. Near Apollo Hospital"
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-400 outline-none"
+                                        className={inputClasses}
                                     />
                                 </div>
                             </div>
                         </div>
 
-                        {/* Address Type & Default */}
-                        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-                            <label className="block text-sm font-bold text-gray-700 mb-3">Address Type</label>
-                            <div className="flex gap-4 mb-4">
-                                <label className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg border cursor-pointer transition-all ${formData.type === 'Home' ? 'bg-blue-50 border-blue-500 text-blue-700' : 'bg-white border-gray-200 hover:bg-gray-50'}`}>
-                                    <input type="radio" name="type" value="Home" checked={formData.type === 'Home'} onChange={handleChange} className="hidden" />
-                                    <Home size={18} />
-                                    <div className="text-left">
-                                        <span className="block font-bold text-sm">Home</span>
-                                        <span className="block text-[10px] opacity-70">All day delivery</span>
-                                    </div>
-                                </label>
-                                <label className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg border cursor-pointer transition-all ${formData.type === 'Work' ? 'bg-blue-50 border-blue-500 text-blue-700' : 'bg-white border-gray-200 hover:bg-gray-50'}`}>
-                                    <input type="radio" name="type" value="Work" checked={formData.type === 'Work'} onChange={handleChange} className="hidden" />
-                                    <Briefcase size={18} />
-                                    <div className="text-left">
-                                        <span className="block font-bold text-sm">Work</span>
-                                        <span className="block text-[10px] opacity-70">10 AM - 5 PM</span>
-                                    </div>
-                                </label>
-                            </div>
-
-                            <label className="flex items-center gap-3 cursor-pointer group">
-                                <div className="relative flex items-center">
-                                    <input type="checkbox" name="isDefault" checked={formData.isDefault} onChange={handleChange} className="peer h-5 w-5 cursor-pointer appearance-none rounded border border-gray-300 checked:bg-blue-600 checked:border-blue-600 transition-all" />
-                                    <svg className="absolute w-3.5 h-3.5 text-white left-1 opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none" viewBox="0 0 14 14" fill="none">
-                                        <path d="M3 8L6 11L11 3.5" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
-                                    </svg>
+                        {/* Default & Type */}
+                        <div className="pt-2">
+                            <label className="flex items-start gap-2 cursor-pointer mb-6 group">
+                                <div className="relative flex items-center pt-0.5">
+                                    <input
+                                        type="checkbox"
+                                        name="isDefault"
+                                        checked={formData.isDefault}
+                                        onChange={handleChange}
+                                        className="w-4 h-4 text-orange-600 border-gray-300 rounded focus:ring-orange-500"
+                                    />
                                 </div>
-                                <span className="text-sm text-gray-700 group-hover:text-blue-600 transition-colors">Make this my default address</span>
+                                <div>
+                                    <span className="text-sm text-gray-900 font-medium">Make this my default address</span>
+                                </div>
                             </label>
-                        </div>
 
+                            <h3 className="text-sm font-bold text-gray-900 mb-2">Address Type</h3>
+                            <div className="flex gap-4">
+                                {["Home", "Work"].map((type) => (
+                                    <label
+                                        key={type}
+                                        className={`
+                                            flex items-center gap-2 px-4 py-2 rounded-lg border cursor-pointer transition-all
+                                            ${formData.type === type
+                                                ? 'bg-[#FDF8E3] border-orange-500 shadow-sm'
+                                                : 'bg-gray-50 border-gray-300 hover:bg-gray-100'
+                                            }
+                                        `}
+                                    >
+                                        <input
+                                            type="radio"
+                                            name="type"
+                                            value={type}
+                                            checked={formData.type === type}
+                                            onChange={handleChange}
+                                            className="accent-orange-600 w-4 h-4"
+                                        />
+                                        <span className="text-sm font-bold text-gray-800">
+                                            {type} {type === 'Home' ? '(7 am – 9 pm delivery)' : '(10 am – 5 pm delivery)'}
+                                        </span>
+                                    </label>
+                                ))}
+                            </div>
+                        </div>
                     </form>
                 </div>
 
-                {/* --- Footer (Sticky) --- */}
-                <div className="p-4 border-t bg-white flex justify-end gap-3 sticky bottom-0 z-10 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+                {/* --- Footer --- */}
+                <div className="p-4 border-t border-[#d5d9d9] bg-gray-50 flex justify-end gap-3 sticky bottom-0 z-10">
                     <button
                         type="button"
                         onClick={onClose}
-                        className="flex-1 md:flex-none px-6 py-3 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 active:scale-95 transition-transform"
+                        className="hidden md:block px-4 py-2 text-sm font-medium text-gray-800 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50"
                     >
                         Cancel
                     </button>
                     <button
                         type="submit"
                         form="addressForm"
-                        className="flex-1 md:flex-none px-8 py-3 text-sm font-bold text-white bg-yellow-500 rounded-lg shadow-md hover:bg-yellow-600 active:scale-95 transition-transform flex items-center justify-center gap-2"
+                        className="w-full md:w-auto px-6 py-2.5 text-sm font-medium text-gray-900 bg-[#FFD814] border border-[#FCD200] rounded-lg shadow-sm hover:bg-[#F7CA00] active:border-[#F0B800]"
                     >
-                        Save Address
+                        {editData ? "Update address" : "Add address"}
                     </button>
                 </div>
-
             </div>
         </div>
     );
