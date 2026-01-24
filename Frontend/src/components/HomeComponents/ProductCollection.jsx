@@ -342,6 +342,7 @@ const ProductCollection = () => {
                                                     addToCart({
                                                         id: item._id,
                                                         name: item.title,
+                                                        productId: item.productId,  
                                                         price: item.finalPrice,
                                                         image: item.images?.[0]?.url,
                                                         quantity: 1, // ✅ MUST

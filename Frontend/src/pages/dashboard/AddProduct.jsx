@@ -323,10 +323,8 @@ You can also write paragraphs.`}
                                         <div className="relative">
                                             <select value={category} onChange={(e) => setCategory(e.target.value)} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-4 py-3 text-white appearance-none focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer">
                                                 <option value="" disabled selected>Select Category</option>
-                                                <option>Scrunchies</option>
-                                                <option>Hair Clips</option>
-                                                <option>Headbands</option>
-                                                <option>Barrettes</option>
+                                                <option>Hair Accessories</option>
+                                                <option>Neck & Hand Accessories</option>
                                                 <option>Home & Kitchen</option>
                                                 <option>Stationery</option>
                                                 <option>Other</option>

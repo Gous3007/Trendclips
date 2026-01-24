@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect } from 'react';
-import axios from "axios";
 import api from '../../api/axios';
 
 import {
@@ -11,13 +10,11 @@ import {
 
 // Define your categories here to ensure they match backend data
 const CATEGORIES = [
-    "Headbands",
-    "Scrunchies",
-    "Hair Clips",
-    "Barrettes",
+    "Hair Accessories",
+    "Neck & Hand Accessories",
     "Home & Kitchen",
     "Stationery",
-    "Accessories"
+    "Other"
 ];
 
 const EditProductPage = () => {
@@ -39,7 +36,8 @@ const EditProductPage = () => {
         sku: "",
         category: "Headbands",
         quantity: 0,
-        inStock: true
+        inStock: true,
+        isActive: true   // ✅ SINGLE SOURCE
     });
 
     const [galleryImages, setGalleryImages] = useState([]);
@@ -76,9 +74,9 @@ const EditProductPage = () => {
                 description: product.description || "",
                 price: product.finalPrice || 0,
                 comparePrice: product.price || 0,
-                category: fetchedCategory, // Set Category correctly
+                category: fetchedCategory,
                 quantity: product.quantity || 0,
-                inStock: product.status === "active",
+                isActive: product.isActive ?? true,
                 sku: product.productId || "",
             });
 
@@ -126,7 +124,7 @@ const EditProductPage = () => {
             formData.append("discount", Math.round(discount));
             formData.append("category", productData.category);
             formData.append("quantity", productData.quantity);
-            formData.append("status", productData.inStock ? "active" : "inactive");
+            formData.append("isActive", productData.isActive);
 
             // ✅ ONLY new images upload karo
             galleryImages.forEach(img => {
@@ -159,6 +157,13 @@ const EditProductPage = () => {
     // --- Helpers ---
     const handleInputChange = (field, value) => {
         setProductData(prev => ({ ...prev, [field]: value }));
+    };
+
+    const handleStatusToggle = () => {
+        setProductData(prev => ({
+            ...prev,
+            isActive: !prev.isActive
+        }));
     };
 
     const handleImageUpload = (e) => {
@@ -382,11 +387,18 @@ const EditProductPage = () => {
                         <div className="bg-gray-800 rounded-xl border border-gray-700 p-6 shadow-lg">
                             <h2 className="text-lg font-bold text-white mb-4">Availability</h2>
                             <div className="flex items-center justify-between mb-6 p-3 bg-gray-900 rounded-lg border border-gray-700">
-                                <span className={`font-medium ${productData.inStock ? 'text-green-400' : 'text-gray-500'}`}>
-                                    {productData.inStock ? 'Active' : 'Inactive'}
+                                <span className={productData.isActive ? 'text-green-400' : 'text-gray-500'}>
+                                    {productData.isActive ? 'Active' : 'Inactive'}
                                 </span>
-                                <button onClick={() => handleInputChange('inStock', !productData.inStock)} className={`w-12 h-6 rounded-full p-1 transition-colors duration-300 focus:outline-none ${productData.inStock ? 'bg-green-500' : 'bg-gray-600'}`}>
-                                    <div className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform duration-300 ${productData.inStock ? 'translate-x-6' : 'translate-x-0'}`} />
+                                <button
+                                    onClick={handleStatusToggle}
+                                    className={`w-12 h-6 rounded-full p-1 transition-colors duration-300 focus:outline-none ${productData.isActive ? 'bg-green-500' : 'bg-gray-600'
+                                        }`}
+                                >
+                                    <div
+                                        className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform duration-300 ${productData.isActive ? 'translate-x-6' : 'translate-x-0'
+                                            }`}
+                                    />
                                 </button>
                             </div>
 
@@ -397,7 +409,10 @@ const EditProductPage = () => {
                                     <input
                                         type="number"
                                         value={productData.quantity}
-                                        onChange={(e) => handleInputChange('quantity', e.target.value)}
+                                        onChange={(e) =>
+                                            handleInputChange('quantity', Number(e.target.value))
+                                        }
+
                                         className="w-full bg-gray-900 border border-gray-600 rounded-lg pl-10 pr-4 py-3 text-white focus:ring-2 focus:ring-indigo-500 outline-none"
                                     />
                                 </div>

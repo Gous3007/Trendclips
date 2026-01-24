@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 const AddTocart = () => {
     const navigate = useNavigate();
     const { cartItems, removeFromCart, updateQuantity } = useCart();
-
+   
     // 🛠️ SETTINGS
     const FREE_DELIVERY_LIMIT = 2000;
     const DELIVERY_CHARGE = 70;
@@ -185,6 +185,7 @@ const AddTocart = () => {
                                         deliveryFee,
                                         finalTotal
                                     }
+                                   
                                 })
                             }
                             disabled={hasStockError || cartItems.length === 0}

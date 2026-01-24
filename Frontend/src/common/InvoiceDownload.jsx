@@ -140,10 +140,8 @@ const InvoiceDownload = ({ orderId }) => {
                                         <div style={{ width: "50%", padding: "10px", borderRight: "1px solid #000" }}>
                                             <h4 style={{ margin: "0 0 5px", fontSize: "13px", textTransform: "uppercase" }}>Sold By:</h4>
                                             <p style={{ margin: "0", fontWeight: "bold" }}>TrendClips Store</p>
-                                            <p style={{ margin: "2px 0" }}>123, Fashion Hub, High Street</p>
-                                            <p style={{ margin: "2px 0" }}>Mumbai, Maharashtra, 400001</p>
-                                            <p style={{ margin: "2px 0" }}><b>PAN NO:</b> ABCDE1234F</p>
-                                            <p style={{ margin: "2px 0" }}><b>GST Registration No:</b> 27ABCDE1234F1Z5</p>
+                                            <p style={{ margin: "2px 0" }}>Nath Nagar Ausa</p>
+                                            <p style={{ margin: "2px 0" }}>Latur, Maharashtra, 413520</p>
                                         </div>
                                         <div style={{ width: "50%", padding: "10px" }}>
                                             <h4 style={{ margin: "0 0 5px", fontSize: "13px", textTransform: "uppercase" }}>Billing & Shipping Address:</h4>
@@ -175,7 +173,7 @@ const InvoiceDownload = ({ orderId }) => {
                                                 </td>
                                                 <td style={{ padding: "8px", textAlign: "left", border: "1px solid #ccc" }}>
                                                     <div style={{ fontWeight: "bold" }}>{item.name}</div>
-                                                    <div style={{ fontSize: "10px", color: "#555" }}>Item ID: {item._id?.slice(-6) || 'N/A'}</div>
+                                                    <div style={{ fontSize: "10px", color: "#555" }}>Item ID: {item.productId}</div>
                                                 </td>
                                                 <td style={{ padding: "8px", textAlign: "right", border: "1px solid #ccc" }}>₹{item.mrp.toFixed(2)}</td>
                                                 <td style={{ padding: "8px", textAlign: "center", border: "1px solid #ccc" }}>{item.quantity}</td>
@@ -251,16 +249,75 @@ const InvoiceDownload = ({ orderId }) => {
                                                 <li>This is a computer generated invoice.</li>
                                             </ol>
                                         </div>
-                                        <div style={{ textAlign: "right", width: "30%" }}>
-                                            <p style={{ marginBottom: "30px", fontWeight: "bold" }}>For TrendClips Store</p>
-                                            <div style={{ borderBottom: "1px solid #333", width: "100%", marginBottom: "5px" }}></div>
-                                            <p style={{ fontSize: "12px" }}>Authorized Signatory</p>
+                                        <div
+                                            style={{
+                                                textAlign: "right",
+                                                width: "30%",
+                                                display: "flex",
+                                                flexDirection: "column",
+                                                alignItems: "flex-end"
+                                            }}
+                                        >
+                                            {/* Company Name */}
+                                            <p
+                                                style={{
+                                                    marginBottom: "6px",
+                                                    fontWeight: "bold",
+                                                    fontSize: "13px"
+                                                }}
+                                            >
+                                                For TrendClips Store
+                                            </p>
+
+                                            {/* Signature Box (Perfect Centered) */}
+                                            <div
+                                                style={{
+                                                    width: "140px",
+                                                    height: "60px",
+                                                    display: "flex",
+                                                    alignItems: "center",
+                                                    justifyContent: "center",
+                                                    marginBottom: "6px"
+                                                }}
+                                            >
+                                                <img
+                                                    src="https://res.cloudinary.com/drppaqhmd/image/upload/v1769260348/uzeygmmz1uimaqoh5v6v.png"
+                                                    alt="Authorized Signature"
+                                                    style={{
+                                                        maxWidth: "100%",
+                                                        maxHeight: "100%",
+                                                        objectFit: "contain",
+                                                        display: "block"
+                                                    }}
+                                                />
+                                            </div>
+
+                                            {/* Signature Line */}
+                                            <div
+                                                style={{
+                                                    width: "140px",
+                                                    borderBottom: "1px solid #333",
+                                                    marginBottom: "4px"
+                                                }}
+                                            ></div>
+
+                                            {/* Label */}
+                                            <p
+                                                style={{
+                                                    fontSize: "11px",
+                                                    margin: 0
+                                                }}
+                                            >
+                                                Authorized Signatory
+                                            </p>
                                         </div>
+
+
                                     </div>
                                 )}
 
                                 {/* --- WATERMARK (Bottom of every page) --- */}
-                                 {/* {isLastPage && (
+                                {/* {isLastPage && (
                                     <div style={{
                                         position: "absolute",
                                         bottom: "15mm",

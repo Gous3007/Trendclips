@@ -9,7 +9,6 @@ const AddressPage = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const [editAddress, setEditAddress] = useState(null);
-
     // 🛒 Cart Data
     const {
         cartItems = [],
@@ -19,6 +18,7 @@ const AddressPage = () => {
         buyNow = false,
     } = location.state || {};
 
+    console.log("this is address items ", cartItems);
     // 🧮 Common calculation
     const calculatedSubtotal = cartItems.reduce(
         (acc, item) => acc + item.price * item.quantity,

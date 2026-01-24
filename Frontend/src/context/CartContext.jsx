@@ -48,6 +48,7 @@ export const CartProvider = ({ children }) => {
         });
     };
 
+
     const removeFromCart = (id) => {
         setCartItems(prev => prev.filter(item => item.id !== id));
     };
@@ -80,5 +81,6 @@ export const CartProvider = ({ children }) => {
         </CartContext.Provider>
     );
 };
+
 
 export const useCart = () => useContext(CartContext);

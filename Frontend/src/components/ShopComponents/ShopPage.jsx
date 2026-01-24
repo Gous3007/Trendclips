@@ -91,7 +91,7 @@ const ShopPage = () => {
   const [viewMode, setViewMode] = useState("grid");
   const [favorites, setFavorites] = useState([]);
 
-  const categories = ["Scrunchies", "Headbands", "Hair Clips", "Barrettes", "Home & Kitchen", "Stationery", "Other"];
+  const categories = ["Hair Accessories", "Neck & Hand Accessories", "Home & Kitchen", "Stationery", "Other"];
   const sortOptions = [
     { value: "", label: "Sort by" },
     { value: "price-low", label: "Price: Low to High" },
@@ -359,7 +359,7 @@ const ShopPage = () => {
                             <Star key={star} size={12} fill={star <= Math.round(product.rating) ? "currentColor" : "none"} className={star <= Math.round(product.rating) ? "text-amber-400" : "text-gray-300"} />
                           ))}
                         </div>
-                        <span className="text-xs text-slate-500 font-medium">{product.rating} | 1.2k sold</span>
+                        <span className="text-xs text-slate-500 font-medium">{product.rating}</span>
                       </div>
 
                       <div className="mt-auto border-t border-slate-100 pt-3">

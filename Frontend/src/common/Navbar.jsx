@@ -69,10 +69,8 @@ const Navbar = () => {
   ];
 
   const categories = [
-    "Hair Clips",
-    "Scrunchies",
-    "Headbands",
-    "Barrettes",
+    "Hair Accessories",
+    "Neck & Hand Accessories",
     "Home & Kitchen",
     "Stationery",
     "Other"

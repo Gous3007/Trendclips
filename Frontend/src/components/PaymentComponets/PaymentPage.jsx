@@ -24,6 +24,9 @@ const PaymentPage = () => {
         shippingAddress = {}
     } = location.state || {};
 
+
+
+
     // 🧮 CALCULATIONS
     const subtotals = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
     const totalMRP = cartItems.reduce((acc, item) => acc + item.mrp * item.quantity, 0);
@@ -76,7 +79,7 @@ const PaymentPage = () => {
             setProcessingMessage('Initializing Payment...');
 
             const cashfree = await load({
-                mode: "sandbox",
+                mode: "production", // 🔥 CHANGE HERE
                 paymentSessionId: res.data.paymentSessionId
             });
 
@@ -90,8 +93,6 @@ const PaymentPage = () => {
             setIsLoading(false);
             alert("Unable to initiate payment. Please try again.");
         }
-        // Note: We don't set loading false here immediately if redirecting, 
-        // but for SPA behavior, if logic fails, we stop loading.
     };
 
     return (

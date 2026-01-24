@@ -120,7 +120,7 @@ const AdminOrderDetail = () => {
     const remainingItems = order.items.length - 2;
 
     return (
-        <div className="min-h-screen bg-gray-900 text-gray-100 p-6 md:p-10 font-sans">
+        <div className="min-h-screen bg-[#0B0F19] text-gray-100 p-6 md:p-10 font-sans">
 
             {/* 4. TOASTER COMPONENT (Required to show notifications) */}
             <Toaster position="top-right" reverseOrder={false} />
@@ -178,47 +178,59 @@ const AdminOrderDetail = () => {
                             {visibleItems.map((item, i) => (
                                 <div
                                     key={i}
-                                    className="flex gap-4 p-4 hover:bg-gray-700/30 rounded-lg transition-colors border-b border-gray-700/50 last:border-0"
+                                    className="flex gap-4 p-4 rounded-lg border border-gray-700/60 bg-gray-800/40 hover:bg-gray-700/30 transition-colors"
                                 >
                                     {/* Product Image */}
-                                    <div className="h-20 w-20 shrink-0 rounded-md overflow-hidden border border-gray-600 bg-gray-800">
+                                    <div className="h-20 w-20 shrink-0 rounded-md overflow-hidden border border-gray-600 bg-gray-900">
                                         <img
                                             src={item.image}
                                             alt={item.name}
                                             className="h-full w-full object-cover"
                                             onError={(e) => {
-                                                e.target.src = "/placeholder.png"; // optional fallback
+                                                e.target.src = "/placeholder.png";
                                             }}
                                         />
                                     </div>
 
                                     {/* Product Info */}
                                     <div className="flex-1">
+                                        {/* Title + Price */}
                                         <div className="flex justify-between items-start gap-4">
-                                            <h4 className="font-medium text-gray-200 text-lg leading-snug line-clamp-2">
+                                            <h4 className="font-medium text-gray-200 text-base leading-snug line-clamp-2">
                                                 {item.name}
                                             </h4>
 
-                                            <p className="font-bold text-white whitespace-nowrap">
+                                            <p className="font-bold text-white whitespace-nowrap text-lg">
                                                 ₹{Math.floor(item.price * item.quantity)}
                                             </p>
                                         </div>
 
-                                        <p className="text-sm text-gray-400 mt-1">
-                                            Sold by: <span className="text-gray-300">Trendclips Retail</span>
+                                        {/* Product ID */}
+                                        <p className="text-xs text-gray-400 mt-1">
+                                            Product ID:
+                                            <span className="ml-1 font-mono text-gray-300">
+                                                {item.productId || "N/A"}
+                                            </span>
                                         </p>
 
-                                        <div className="mt-2 flex items-center gap-4 text-sm">
-                                            <span className="bg-gray-700 text-gray-300 px-2 py-0.5 rounded">
+                                        {/* Seller */}
+                                        <p className="text-sm text-gray-400 mt-1">
+                                            Sold by: <span className="text-gray-300">TrendClips Retail</span>
+                                        </p>
+
+                                        {/* Quantity & Unit Price */}
+                                        <div className="mt-3 flex items-center gap-4 text-sm">
+                                            <span className="bg-gray-700/70 text-gray-200 px-2.5 py-1 rounded-md">
                                                 Qty: {item.quantity}
                                             </span>
 
                                             <span className="text-gray-400">
-                                                Unit: ₹{Math.floor(item.price)}
+                                                Unit Price: ₹{Math.floor(item.price)}
                                             </span>
                                         </div>
                                     </div>
                                 </div>
+
                             ))}
 
 

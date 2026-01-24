@@ -108,6 +108,7 @@ const Sidebar = () => {
 
                     {/* Add Product */}
                     <button
+                        onClick={() => navigate(`/trendclips/secure-panel-x308/dashboard/add`)}
                         className="
             w-full mb-4
             bg-linear-to-r from-sky-500 to-blue-600
