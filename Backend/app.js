@@ -21,9 +21,22 @@ const app = express();
 app.use(cookieParser());
 
 app.use(cors({
-    origin: "https://www.trendclips.in", // frontend URL
+    origin: [
+        "http://localhost:5173",
+        "https://www.trendclips.in"
+    ],
     credentials: true
 }));
+
+
+// 🔥 CASHFREE WEBHOOK — RAW BODY ONLY
+app.post(
+    "/api/webhook/cashfree",
+    express.raw({ type: "application/json" }),
+    require("./routes/cashfreeWebhook")
+);
+
+
 // --------------------
 // Middlewares
 // --------------------
@@ -36,7 +49,6 @@ app.use(express.urlencoded({ extended: true }));
 // --------------------
 app.use("/api/users", require("./routes/user.js"));
 app.use("/api/products", require("./routes/productRoutes"));
-app.use("/api/webhook", require("./routes/cashfreeWebhook"));
 app.use("/api/order", require("./routes/orderStatus"));
 app.use("/api/edit", EditProductRoute);
 app.use("/api/showcase", ShowcaseRoute);

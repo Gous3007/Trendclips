@@ -28,12 +28,12 @@ exports.createCashfreeOrder = async ({ orderId, amount, customer }) => {
                 headers: {
                     "x-client-id":
                         process.env.CASHFREE_MODE === "production"
-                            ? process.env.CASHFREE_PROD_APP_ID
+                            ? process.env.CASHFREE_APP_ID
                             : process.env.CASHFREE_SANDBOX_APP_ID,
 
                     "x-client-secret":
                         process.env.CASHFREE_MODE === "production"
-                            ? process.env.CASHFREE_PROD_SECRET_KEY
+                            ? process.env.CASHFREE_SECRET_KEY
                             : process.env.CASHFREE_SANDBOX_SECRET_KEY,
 
                     "x-api-version": "2023-08-01",

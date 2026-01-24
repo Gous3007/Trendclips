@@ -61,13 +61,16 @@ exports.updateProductByProductId = async (req, res) => {
     try {
         const { productId } = req.params;
 
-        // 1. Get product first
+        // 1️⃣ Find product
         const product = await Product.findOne({ productId });
         if (!product) {
-            return res.status(404).json({ success: false, message: "Product not found" });
+            return res.status(404).json({
+                success: false,
+                message: "Product not found"
+            });
         }
 
-        // 2. DELETE images from cloudinary
+        // 2️⃣ Delete images from cloudinary
         const deletedImages = req.body.deletedImages || [];
 
         if (deletedImages.length > 0) {
@@ -76,7 +79,7 @@ exports.updateProductByProductId = async (req, res) => {
             }
         }
 
-        // 3. UPLOAD new images
+        // 3️⃣ Upload new images
         let newUploadedImages = [];
 
         if (req.files && req.files.length > 0) {
@@ -90,24 +93,28 @@ exports.updateProductByProductId = async (req, res) => {
             }
         }
 
-        // 4. FILTER old images (remove deleted ones)
+        // 4️⃣ Keep only remaining old images
         const remainingImages = product.images.filter(
             img => !deletedImages.includes(img.public_id)
         );
 
-        // 5. MERGE old + new images
-        const finalImages = [...remainingImages, ...newUploadedImages];
+        // 5️⃣ Merge images
+        product.images = [...remainingImages, ...newUploadedImages];
 
-        // 6. Update product
+        // 6️⃣ Update fields
         product.title = req.body.title;
         product.description = req.body.description;
-        product.price = req.body.price;
-        product.finalPrice = req.body.finalPrice;
-        product.discount = req.body.discount;
+        product.price = Number(req.body.price);
+        product.finalPrice = Number(req.body.finalPrice);
+        product.discount = Number(req.body.discount);
         product.category = req.body.category;
-        product.quantity = req.body.quantity;
-        product.status = req.body.status;
-        product.images = finalImages;
+        product.quantity = Number(req.body.quantity);
+
+        // ✅ IMPORTANT: isActive handling
+        if (req.body.isActive !== undefined) {
+            product.isActive =
+                req.body.isActive === "true" || req.body.isActive === true;
+        }
 
         await product.save();
 
@@ -119,7 +126,11 @@ exports.updateProductByProductId = async (req, res) => {
 
     } catch (error) {
         console.error("UPDATE PRODUCT ERROR:", error);
-        res.status(500).json({ success: false, message: "Server error" });
+        res.status(500).json({
+            success: false,
+            message: "Server error"
+        });
     }
 };
+
 

@@ -4,7 +4,7 @@ const Order = require("../model/Order");
 const PaymentOrder = require("../model/PaymentOrder");
 const Product = require("../model/Product");
 
-router.post("/cashfree", async (req, res) => {
+router.post("/", async (req, res) => {
     try {
         const event = req.body;
 

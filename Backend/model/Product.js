@@ -47,10 +47,8 @@ const productSchema = new mongoose.Schema(
         category: {
             type: String,
             enum: [
-                "Hair Clips",
-                "Scrunchies",
-                "Headbands",
-                "Barrettes",
+                "Hair Accessories",
+                "Neck & Hand Accessories",
                 "Home & Kitchen",
                 "Stationery",
                 "Other"
@@ -63,10 +61,9 @@ const productSchema = new mongoose.Schema(
             default: 0
         },
 
-        status: {
-            type: String,
-            enum: ["active", "inactive"],
-            default: "active"
+        isActive: {
+            type: Boolean,
+            default: true
         }
     },
     { timestamps: true }

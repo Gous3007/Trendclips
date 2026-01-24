@@ -45,14 +45,12 @@ exports.getAllOrders = async (req, res) => {
 
         // Data Formatting
         const formatted = orders.map(o => {
-            // Address model se name nikalna
-            // Agar address delete ho gaya ho ya na mile, toh "Unknown" ya "Guest" dikhayein
             const customerName = o.shippingAddress ? o.shippingAddress.name : "Guest User";
 
             return {
                 _id: o._id,
                 orderId: o.orderId,
-                customer: customerName, // <--- Ab ye Address model wala name hai
+                customer: customerName, 
                 date: o.createdAt,
                 amount: `₹${o.priceDetails?.total || 0}`, // Safety check added
                 status: o.orderStatus

@@ -2,10 +2,8 @@ const Product = require("../model/Product");
 const cloudinary = require("../config/cloudinary");
 
 const categoryPrefixMap = {
-    "Hair Clips": "HC",
-    "Scrunchies": "SC",
-    "Headbands": "HB",
-    "Barrettes": "BR",
+    "Hair Accessories": "HA",
+    "Neck & Hand Accessories": "NH",
     "Home & Kitchen": "HK",
     "Stationery": "ST",
     "Other": "OT"
@@ -77,11 +75,15 @@ exports.createProduct = async (req, res) => {
             }
         }
 
+        const calculateFinalPrice = (price, discount = 0) => {
+            const discounted =
+                discount > 0 ? price - (price * discount) / 100 : price;
+
+            return Math.round(discounted * 100) / 100;
+        };
+
         // 🔹 Price calculation
-        const finalPrice =
-            discount > 0
-                ? price - (price * discount) / 100
-                : price;
+        const finalPrice = calculateFinalPrice(price, discount);
 
         // 🔹 Save to DB
         const product = await Product.create({
@@ -113,10 +115,9 @@ exports.getAllProducts = async (req, res) => {
     try {
         const { category } = req.query;
 
-        // 🧠 filter object
-        let filter = {};
-
-        // ✅ agar category aayi hai to filter lagao
+        // ✅ only ACTIVE products for users
+        let filter = { isActive: true };
+        console.log(filter);
         if (category) {
             filter.category = category;
         }
@@ -135,6 +136,25 @@ exports.getAllProducts = async (req, res) => {
         res.status(500).json({ message: "Server error" });
     }
 };
+
+
+exports.getAllProductsAdmin = async (req, res) => {
+    try {
+        const products = await Product
+            .find() // admin sees ALL
+            .sort({ createdAt: -1 });
+
+        res.status(200).json({
+            success: true,
+            products
+        });
+
+    } catch (error) {
+        console.error("ADMIN PRODUCTS ERROR:", error);
+        res.status(500).json({ message: error.message });
+    }
+};
+
 
 exports.deleteProduct = async (req, res) => {
     try {

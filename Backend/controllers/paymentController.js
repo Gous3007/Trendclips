@@ -27,14 +27,16 @@ exports.createPayment = async (req, res) => {
             guestId,
 
             items: cartItems.map(item => ({
-                productId: item.id,
+                product: item.id,          // MongoDB ObjectId (reference)
+                mongoId: item.id,          // (optional – debugging/admin)
+                productId: item.productId, // ✅ "NH0001" (IMPORTANT)
                 name: item.name,
                 mrp: item.mrp,
                 price: item.price,
                 quantity: item.quantity,
                 image: item.image
             })),
-
+            
             shippingAddress: {
                 name: shippingAddress.name,
                 mobile: shippingAddress.mobile,
