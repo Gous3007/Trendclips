@@ -14,7 +14,7 @@ router.post("/", async (req, res) => {
         }
 
         // 🔥 PAYMENT SUCCESS
-        if (event.type === "PAYMENT_SUCCESS_WEBHOOK") {
+        if (event.type === "PAYMENT_SUCCESS") {
 
             const cashfreeOrderId = event?.data?.order?.order_id;
 
@@ -62,7 +62,7 @@ router.post("/", async (req, res) => {
             }
         }
 
-        if (event.type === "PAYMENT_FAILED_WEBHOOK") {
+        if (event.type === "PAYMENT_FAILED") {
 
             const cashfreeOrderId = event?.data?.order?.order_id;
 
