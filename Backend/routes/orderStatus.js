@@ -71,4 +71,111 @@ router.get("/guest-has-orders/:guestId", async (req, res) => {
     }
 });
 
+router.post("/cancel/:orderId", async (req, res) => {
+    try {
+        const { orderId } = req.params;
+
+        const order = await Order.findOne({ orderId });
+
+        if (!order) {
+            return res.status(404).json({
+                success: false,
+                message: "Order not found"
+            });
+        }
+
+        // ❌ Already success ho chuka
+        if (order.payment.status === "SUCCESS") {
+            return res.status(400).json({
+                success: false,
+                message: "Order already paid, cannot cancel"
+            });
+        }
+
+        // ❌ Already cancelled
+        if (order.orderStatus === "CANCELLED") {
+            return res.json({
+                success: true,
+                message: "Order already cancelled"
+            });
+        }
+
+        // ✅ Cancel allowed only if pending
+        order.payment.status = "CANCELLED";
+        order.orderStatus = "CANCELLED";
+        await order.save();
+
+        res.json({
+            success: true,
+            message: "Order cancelled successfully"
+        });
+
+    } catch (err) {
+        console.error("Cancel order error ❌", err);
+        res.status(500).json({ success: false });
+    }
+});
+
+router.get("/pending/:orderId", async (req, res) => {
+    try {
+        const { orderId } = req.params;
+
+        const order = await Order.findOne({ orderId });
+
+        if (!order) {
+            return res.status(404).json({
+                success: false,
+                message: "Order not found"
+            });
+        }
+
+        if (order.payment.status === "PENDING") {
+            return res.json({
+                success: true,
+                pending: true,
+                orderStatus: order.orderStatus
+            });
+        }
+
+        res.json({
+            success: true,
+            pending: false,
+            orderStatus: order.orderStatus
+        });
+
+    } catch (err) {
+        res.status(500).json({ success: false });
+    }
+});
+
+router.post("/auto-cancel-pending", async (req, res) => {
+    try {
+        const THIRTY_MIN = 30 * 60 * 1000;
+        const cutoffTime = new Date(Date.now() - THIRTY_MIN);
+
+        const result = await Order.updateMany(
+            {
+                "payment.status": "PENDING",
+                createdAt: { $lt: cutoffTime }
+            },
+            {
+                $set: {
+                    "payment.status": "CANCELLED",
+                    orderStatus: "CANCELLED"
+                }
+            }
+        );
+
+        res.json({
+            success: true,
+            cancelledOrders: result.modifiedCount
+        });
+
+    } catch (err) {
+        console.error("Auto cancel error ❌", err);
+        res.status(500).json({ success: false });
+    }
+});
+
+
 module.exports = router;

@@ -21,7 +21,7 @@ exports.createCashfreeOrder = async ({ orderId, amount, customer }) => {
                 },
 
                 order_meta: {
-                    return_url: `${process.env.FRONTEND_URL}/payment/success?order_id=${orderId}`
+                    return_url: `${process.env.FRONTEND_URL}/payment/callback?order_id=${orderId}`
                 }
             },
             {

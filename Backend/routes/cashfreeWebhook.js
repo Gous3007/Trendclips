@@ -13,34 +13,35 @@ router.post("/", async (req, res) => {
             return res.status(400).json({ error: "Invalid webhook" });
         }
 
-        // 🔥 PAYMENT SUCCESS
+
         if (event.type === "PAYMENT_SUCCESS") {
 
+            const paymentStatus = event?.data?.payment?.payment_status;
             const cashfreeOrderId = event?.data?.order?.order_id;
 
-            const payment = await PaymentOrder.findOneAndUpdate(
-                { cashfreeOrderId },
-                { status: "SUCCESS" },
-                { new: true }
-            );
-
-            if (!payment) {
+            // ❌ Agar payment SUCCESS nahi hai → ignore
+            if (paymentStatus !== "SUCCESS") {
                 return res.json({ received: true });
             }
 
-            // 🔒 Order fetch karo
-            const order = await Order.findOne({ "payment.paymentOrderId": payment._id });
+            const payment = await PaymentOrder.findOne({ cashfreeOrderId });
 
-            if (!order) {
+            if (!payment || payment.status === "SUCCESS") {
                 return res.json({ received: true });
             }
 
-            // 🔁 Duplicate webhook protection
-            if (order.payment.status === "SUCCESS") {
+            payment.status = "SUCCESS";
+            await payment.save();
+
+            const order = await Order.findOne({
+                "payment.paymentOrderId": payment._id
+            });
+
+            if (!order || order.payment.status === "SUCCESS") {
                 return res.json({ received: true });
             }
 
-            // ✅ Order status update
+            // ✅ CONFIRM ONLY HERE
             order.payment.status = "SUCCESS";
             order.orderStatus = "CONFIRMED";
             await order.save();
