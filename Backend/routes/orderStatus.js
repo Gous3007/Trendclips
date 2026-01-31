@@ -7,16 +7,15 @@ router.get("/status/:orderId", async (req, res) => {
         const order = await Order.findOne({ orderId: req.params.orderId });
 
         if (!order) {
-            return res.status(404).json({ success: false });
+            return res.json({ status: "FAILED" });
         }
 
-        res.json({
-            success: order.payment.status === "SUCCESS",
-            status: order.payment.status
+        return res.json({
+            status: order.payment.status || "PENDING"
         });
 
     } catch (err) {
-        res.status(500).json({ success: false });
+        return res.json({ status: "FAILED" });
     }
 });
 

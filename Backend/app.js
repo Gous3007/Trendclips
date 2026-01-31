@@ -16,6 +16,7 @@ const adminRecnetOrder = require("./routes/adminRecentOrders.js");
 const adminOrderPage = require("./routes/adminOrders.js");
 const adminShippingRoutes = require("./routes/adminDetailsOrders.js");
 const contactRoutes = require("./routes/contactRoutes");
+const orderRoutes = require("./routes/orderRoutes");
 
 const app = express();
 app.use(cookieParser());
@@ -61,7 +62,7 @@ app.use("/api/dashboard", adminRecnetOrder);
 app.use("/api/dashboard", adminOrderPage);
 app.use("/api/dashboard", adminShippingRoutes);
 app.use("/api", contactRoutes);
-
+app.use("/api", orderRoutes);
 
 // --------------------
 // React Build Serve
