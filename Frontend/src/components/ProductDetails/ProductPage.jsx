@@ -157,7 +157,7 @@ const ProductPage = () => {
                     url: shareUrl,
                 });
             } catch (err) {
-                console.log("Share cancelled");
+                console.error("Share cancelled:", err);
             }
         } else {
             await navigator.clipboard.writeText(shareUrl);
@@ -274,8 +274,8 @@ const ProductPage = () => {
                                     Pack of {product.packOf}
                                 </span>
                             )}
-                          
-                            
+
+
                             {product.discount > 0 && (
                                 <div className="text-sm text-red-700 font-medium">
                                     -{product.discount}% <span className="text-gray-500 line-through font-normal ml-1">₹{product.price}</span>
@@ -475,6 +475,7 @@ const ProductPage = () => {
                                                 buyNow: true,
                                                 cartItems: [{
                                                     id: product._id,
+                                                    productId: product.productId,    // ✅ VERY IMPORTANT ("NH0001")
                                                     name: product.title,
                                                     price: product.finalPrice || product.price,
                                                     image: product.images?.[0]?.url,
@@ -517,6 +518,7 @@ const ProductPage = () => {
                                 flyToCart(product.imgRef);
                                 addToCart({
                                     id: product._id,
+                                    productId: product.productId,    // ✅ VERY IMPORTANT ("NH0001")
                                     name: product.title,
                                     price: product.finalPrice,
                                     image: product.images?.[0]?.url,

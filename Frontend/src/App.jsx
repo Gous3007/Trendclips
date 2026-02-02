@@ -10,7 +10,6 @@ import Contact from "./pages/Contact";
 import Products from "./pages/Products";
 import AddToCart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
-import PaymentPage from "./pages/Payments";
 import AddressPage from "./pages/Address";
 import DashboardLayout from "./layouts/DashboardLayout";
 import DashboardHome from "./pages/dashboard/DashboardHome";
@@ -22,11 +21,14 @@ import ShowcaseManager from "./pages/dashboard/ShowcaseManager.jsx";
 import OrderDetails from "./pages/dashboard/AdminOrderDetail.jsx";
 import ContactPage from "./pages/dashboard/ContactPage.jsx";
 import { initLenis, destroyLenis } from "./utils/lenis";
-import PageLoaderWrapper from "./components/Loaders/PageLoaderWrapper.jsx";
 import AdminLogin from "./pages/AdminLogin.jsx";
 import AdminRoute from "./routes/AdminRoute";
 import NotFound from "./pages/NotFound";
+import PaymentPage from "./pages/Payments";
 import PaymentSuccess from "./pages/PaymentSucess.jsx";
+import PaymentPending from "./pages/PaymentPending.jsx";
+import PaymentFailed from "./pages/PaymentFailed.jsx";
+import PaymentCallback from "./pages/PaymentCallback.jsx";
 import MyOrder from "./pages/MyOrders.jsx"
 
 const AnimatedRoutes = () => {
@@ -48,7 +50,7 @@ const AnimatedRoutes = () => {
   return (
     <AnimatePresence mode="wait">
       <CartProvider>
-        <PageLoaderWrapper>
+
           <Routes location={location} key={location.pathname}>
             <Route element={<MainLayout />}>
               <Route path="/" element={<Home />} />
@@ -59,9 +61,15 @@ const AnimatedRoutes = () => {
               <Route path="/info/products/:id" element={<Products />} />
               <Route path="/cart" element={<AddToCart />} />
               <Route path="/checkout" element={<Checkout />} />
-              <Route path="/payment" element={<PaymentPage />} />
               <Route path="/address" element={<AddressPage />} />
+
+              {/* PAYMENT FLOW */}
+              <Route path="/payment" element={<PaymentPage />} />
+              <Route path="/payment/callback" element={<PaymentCallback />} />
               <Route path="/payment/success" element={<PaymentSuccess />} />
+              <Route path="/payment/pending" element={<PaymentPending />} />
+              <Route path="/payment/failed" element={<PaymentFailed />} />
+
               <Route path="/my-orders" element={<MyOrder />} />
             </Route>
             <Route path="/adminlogin" element={<AdminLogin />} />
@@ -85,7 +93,6 @@ const AnimatedRoutes = () => {
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
-        </PageLoaderWrapper>
       </CartProvider>
     </AnimatePresence>
   );

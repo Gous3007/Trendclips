@@ -24,9 +24,6 @@ const PaymentPage = () => {
         shippingAddress = {}
     } = location.state || {};
 
-
-
-
     // 🧮 CALCULATIONS
     const subtotals = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
     const totalMRP = cartItems.reduce((acc, item) => acc + item.mrp * item.quantity, 0);

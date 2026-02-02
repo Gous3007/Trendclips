@@ -18,7 +18,6 @@ const AddressPage = () => {
         buyNow = false,
     } = location.state || {};
 
-    console.log("this is address items ", cartItems);
     // 🧮 Common calculation
     const calculatedSubtotal = cartItems.reduce(
         (acc, item) => acc + item.price * item.quantity,

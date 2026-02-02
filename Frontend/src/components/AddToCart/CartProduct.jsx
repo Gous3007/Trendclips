@@ -9,7 +9,7 @@ const AddTocart = () => {
    
     // 🛠️ SETTINGS
     const FREE_DELIVERY_LIMIT = 2000;
-    const DELIVERY_CHARGE = 70;
+    const DELIVERY_CHARGE = 1;
 
     // 🧮 CALCULATIONS
     const subtotal = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);

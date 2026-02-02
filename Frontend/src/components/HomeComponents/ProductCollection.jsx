@@ -7,13 +7,11 @@ import { useNavigate } from "react-router-dom";
 import api from "../../api/axios.js";
 
 const categories = [
-    { id: 1, name: "Hair Clips", image: "https://m.media-amazon.com/images/I/61L9MRQdoGL._AC_UL480_FMwebp_QL65_.jpg" },
-    { id: 2, name: "Scrunchies", image: "https://m.media-amazon.com/images/I/81yyuU2jddL._AC_UL480_FMwebp_QL65_.jpg" },
-    { id: 3, name: "Headbands", image: "https://m.media-amazon.com/images/I/51rbbgUbx0L._AC_UL480_FMwebp_QL65_.jpg" },
-    { id: 4, name: "Barrettes", image: "https://m.media-amazon.com/images/I/71+Oqacy34L._AC_UL480_FMwebp_QL65_.jpg" },
-    { id: 5, name: "Home & Kitchen", image: "https://m.media-amazon.com/images/I/51yc7Nsy73L._AC_UL480_FMwebp_QL65_.jpg" },
-    { id: 6, name: "Stationery", image: "https://m.media-amazon.com/images/I/8115Djt33ML._AC_UL480_FMwebp_QL65_.jpg" },
-    { id: 7, name: "Other", image: "https://res.cloudinary.com/drppaqhmd/image/upload/v1769096516/net8i4t3j7xzutpl3xwm.webp" },
+    { id: 1, name: "Hair Accessories", image: "https://m.media-amazon.com/images/I/61L9MRQdoGL._AC_UL480_FMwebp_QL65_.jpg" },
+    { id: 2, name: "Neck & Hand Accessories", image: "https://m.media-amazon.com/images/I/51rbbgUbx0L._AC_UL480_FMwebp_QL65_.jpg" },
+    { id: 3, name: "Home & Kitchen", image: "https://m.media-amazon.com/images/I/51yc7Nsy73L._AC_UL480_FMwebp_QL65_.jpg" },
+    { id: 4, name: "Stationery", image: "https://m.media-amazon.com/images/I/8115Djt33ML._AC_UL480_FMwebp_QL65_.jpg" },
+    { id: 5, name: "Other", image: "https://res.cloudinary.com/drppaqhmd/image/upload/v1769096516/net8i4t3j7xzutpl3xwm.webp" },
 ];
 
 // --- SKELETON LOADER COMPONENT ---
