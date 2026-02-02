@@ -36,7 +36,7 @@ exports.createPayment = async (req, res) => {
                 quantity: item.quantity,
                 image: item.image
             })),
-            
+
             shippingAddress: {
                 name: shippingAddress.name,
                 mobile: shippingAddress.mobile,

@@ -117,7 +117,6 @@ exports.getAllProducts = async (req, res) => {
 
         // ✅ only ACTIVE products for users
         let filter = { isActive: true };
-        console.log(filter);
         if (category) {
             filter.category = category;
         }
